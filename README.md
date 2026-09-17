@@ -16,6 +16,7 @@ npm run dev
 - 식장 지도 전용 화면: http://127.0.0.1:5173/?view=location
 - 날짜/공유/참조 자료 테스트: `npm test`
 - 배포 빌드: `npm run build`
+- Secret 빌드 비노출 검증(가상 데이터): `npm run test:private-build`
 
 ## 현재 구현
 
@@ -39,10 +40,10 @@ npm run dev
 
 ## 실제 정보로 교체
 
-`src/config.mjs`에 이름, 날짜, 연락처, 계좌, 사진, 식장 정보를 모았습니다.
+`src/config.mjs`는 공개 가능한 기본값과 예식일·사진·식장 설정입니다. 실제 이름, 연락처, 계좌는 아래 Secret 또는 Git에서 제외된 `private-config.local.json`에 입력합니다. 공개 설정 파일에 실제 개인정보를 다시 넣지 마세요. 예식일과 공개용 카카오 JavaScript 키는 기본 설정을 유지하며 Secret으로 덮어쓸 수도 있습니다.
 
 1. 예식 날짜는 `2027-05-22T12:00:00+09:00`처럼 한국 시간 오프셋을 유지합니다.
-2. `groom`, `bride`, `accounts`를 수정합니다. 제목·공유 문구도 함께 바꿉니다.
+2. 비공개 JSON의 `groom`, `bride`, `accounts`를 수정합니다. `title`, `description`, `date`도 함께 바꿉니다.
 3. 본인 사진과 사용권을 확보한 음악을 `public` 아래 배치합니다. `hero`, `gallery`, `shareImage`, `musicUrl`은 `./images/...` 같은 상대 경로를 사용합니다.
 	- `gallery` 배열에 `{ src: "./images/photo-06.jpg", alt: "사진 설명" }` 형식으로 총 20장까지 등록합니다. 배열 순서대로 첫 5장과 나머지 가로 갤러리를 구성합니다.
 	- 샘플 사진 20장이 기본 등록되어 있으며, 사진 추가/업로드 버튼은 없습니다. 실제 배포 사진은 파일과 `gallery` 설정에서 교체하세요.
@@ -51,7 +52,21 @@ npm run dev
 6. 시간표 사진은 프로젝트에 직접 추가합니다. `public/images/bus-600.jpg`, `public/images/bus-601.jpg`에 파일을 넣은 뒤 `src/config.mjs`의 `id: "bus600"` 노선에는 `timetable: "./images/bus-600.jpg"`, `id: "bus601"` 노선에는 `timetable: "./images/bus-601.jpg"`를 설정합니다. PNG/WebP도 실제 파일 확장자에 맞춰 사용할 수 있습니다. 웹 경로에는 `public/`을 붙이지 않습니다. `timetable: ""`이면 빈 이미지 영역만 유지되며, 파일만 넣는 것으로 자동 표시되지는 않습니다. 사진은 잘리지 않게 표시되고 누르면 확대됩니다. 파일과 설정을 함께 포함해 다시 빌드·배포하세요.
 7. `siteUrl`에 저장소 경로를 포함한 최종 HTTPS 주소와 마지막 `/`를 입력합니다. 예: `https://USER.github.io/wedding/`.
 8. 카카오 JavaScript 키를 `kakaoJsKey`에 입력하고 카카오 개발자 콘솔에 JavaScript SDK 도메인과 제품 링크 웹 도메인을 등록합니다. JavaScript 키는 도메인 제한을 적용하는 공개용 키입니다. REST/어드민 비밀 키를 프런트엔드에 넣지 않습니다.
-9. 실제 공개 전 `demo: false`로 변경하고 `npm run build`를 다시 실행합니다. 이 설정은 실제 내용 확인을 대신하지 않습니다.
+9. 비공개 JSON이 적용되면 `demo: false`로 자동 전환됩니다. `npm run build`로 확인합니다. 이 설정은 실제 내용 확인을 대신하지 않습니다.
+
+## GitHub Secrets로 개인정보 관리
+
+1. 저장소 Settings > Secrets and variables > Actions에 `WEDDING_PRIVATE_CONFIG`를 등록합니다. 값은 `private-config.example.json`과 같은 JSON 객체이며 실제 정보로 교체합니다. 예시 파일 자체에는 개인정보를 넣지 않습니다.
+2. 필수 항목은 `groom.name`, `bride.name`, `accounts`입니다. 계좌는 예시와 같은 side/role 조합 6개를 모두 포함해야 합니다. 공개하지 않을 은행·계좌·전화번호는 빈 문자열로 둡니다. 번호는 숫자가 아닌 문자열이어야 합니다.
+3. `groom`, `bride`는 필드별 병합입니다. `name`을 입력하고 부모 이름·영문 이름을 생략하면 예시 이름을 표시하지 않도록 비웁니다. `short`가 생략되고 `name`이 있으면 `name`을 표시합니다. `accounts`는 배열 전체를 교체합니다.
+4. 추가 허용 항목은 `title`, `date`, `description`, `siteUrl`, `kakaoJsKey`, `shareImage`입니다. 제목을 생략하면 신랑·신부 이름으로 만듭니다. 날짜는 생략하면 공개 기본 설정의 예식일을 사용합니다. `siteUrl`은 `https://YOUR_ID.github.io/wedding/` 형식이며 저장소 주소 `https://github.com/...`는 사용할 수 없습니다. 실제 배포 계정과 저장소 이름을 확인하세요. 알 수 없는 필드는 오류로 처리합니다.
+5. Actions에서 빌드 단계에만 Secret을 환경변수로 전달합니다. Secret이 없거나 JSON/필수값이 잘못되면 배포를 중단합니다. 개인정보는 로그에 출력하지 않습니다.
+6. Vite가 메모리에서 설정을 합치고 앱 코드와 공유 메타데이터를 `dist`에 생성합니다. 추적되는 `src/config.mjs`, `index.html`에는 실제 값을 기록하지 않습니다. 원본 HTML을 덮어쓰던 metadata 스크립트는 제거했습니다.
+7. Secret 변경 후 Actions > Deploy Wedding Invitation > Run workflow를 실행해야 반영됩니다. Secret 수정 자체로 배포가 시작되지는 않습니다.
+
+로컬에서는 `private-config.local.json`을 프로젝트 루트에 두면 `npm run dev`와 `npm run build`에서 읽습니다. 현재 입력되어 있던 정보는 이 파일에 보존했습니다. 이 파일은 `.gitignore`로 제외하고 개발 서버의 직접 파일 요청도 차단합니다. 값을 변경한 뒤 개발 서버를 재시작하세요. JSON이 없으면 로컬은 공개 예시로 실행되며, 환경변수 `WEDDING_PRIVATE_CONFIG`가 있으면 로컬 파일보다 우선합니다. GitHub Actions는 로컬 파일로 대체하지 않습니다.
+
+**Secret은 공개 저장소에서만 정보를 숨깁니다. 배포된 HTML/JavaScript 및 사이트 방문자에게는 해당 정보가 공개됩니다.** 이전 커밋에 들어간 개인정보는 이 변경으로 삭제되지 않습니다. 공개 전 Git 이력과 이미 게시된 자료를 별도로 확인하세요. 로컬 JSON을 `git add -f`로 추가하거나 전체 폴더 ZIP에 포함하지 마세요. 원래 파일이 이미 Git 추적 중이었다면 `.gitignore`만으로 추적이 해제되지 않습니다.
 
 ## 공유 제약
 

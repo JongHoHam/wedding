@@ -28,7 +28,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npm run build
+      - name: Build with private invitation settings
+        run: npm run build
+        env:
+          REQUIRE_PRIVATE_CONFIG: 'true'
+          WEDDING_PRIVATE_CONFIG: ${{ secrets.WEDDING_PRIVATE_CONFIG }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

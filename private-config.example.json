@@ -1,0 +1,26 @@
+{
+  "title": "서준 · 지우, 결혼합니다",
+  "description": "소중한 분들을 저희의 시작에 초대합니다.",
+  "date": "2027-05-22T12:00:00+09:00",
+  "siteUrl": "https://YOUR_ID.github.io/wedding/",
+  "kakaoJsKey": "",
+  "shareImage": "./images/hero.jpg",
+  "groom": {
+    "name": "김서준", "short": "서준", "english": "Seojun",
+    "father": "김정호", "mother": "박미경",
+    "phone": "", "fatherPhone": "", "motherPhone": ""
+  },
+  "bride": {
+    "name": "이지우", "short": "지우", "english": "Jiwoo",
+    "father": "이영수", "mother": "최은정",
+    "phone": "", "fatherPhone": "", "motherPhone": ""
+  },
+  "accounts": [
+    { "side": "groom", "role": "신랑", "name": "김서준", "bank": "", "number": "" },
+    { "side": "groom", "role": "아버지", "name": "김정호", "bank": "", "number": "" },
+    { "side": "groom", "role": "어머니", "name": "박미경", "bank": "", "number": "" },
+    { "side": "bride", "role": "신부", "name": "이지우", "bank": "", "number": "" },
+    { "side": "bride", "role": "아버지", "name": "이영수", "bank": "", "number": "" },
+    { "side": "bride", "role": "어머니", "name": "최은정", "bank": "", "number": "" }
+  ]
+}

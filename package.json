@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "node scripts/metadata.mjs && vite build --base=./",
+    "build": "vite build",
+    "test:private-build": "node scripts/check-private-build.mjs",
     "test": "node --test tests/*.test.mjs",
     "collect": "node scripts/collect.mjs"
   },
