@@ -15,7 +15,9 @@ import {
   MessageCircle,
   Navigation,
   ParkingCircle,
+  Pause,
   Phone,
+  Play,
   Share2,
   Volume2,
   VolumeX,
@@ -718,6 +720,50 @@ function Research() {
   );
 }
 
+function HeroVideo({ active }) {
+  const video = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const play = () => {
+    if (!video.current) return;
+    video.current.muted = true;
+    video.current.play().catch(() => setPlaying(false));
+  };
+  useEffect(() => {
+    if (active) play();
+    else video.current?.pause();
+  }, [active]);
+  if (failed || !config.heroVideo) return null;
+  return (
+    <>
+      <video
+        ref={video}
+        className={`hero-video${ready ? " is-playing" : ""}`}
+        src={config.heroVideo}
+        poster={config.hero}
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+        onPlaying={() => { setReady(true); setPlaying(true); }}
+        onPause={() => setPlaying(false)}
+        onError={() => setFailed(true)}
+      />
+      {active && (
+        <IconButton
+          className="hero-video-control"
+          label={playing ? "영상 일시정지" : "영상 재생"}
+          onClick={() => playing ? video.current?.pause() : play()}
+        >
+          {playing ? <Pause size={18} /> : <Play size={18} />}
+        </IconButton>
+      )}
+    </>
+  );
+}
+
 function Invitation() {
   const entranceText = "소중한 분들을 초대합니다.";
   const [sound, setSound] = useState(false);
@@ -835,7 +881,7 @@ function Invitation() {
       <a className="skip-link" href="#invitation">
         초대글로 바로가기
       </a>
-      <header className="topbar">
+      {locationOnly && <header className="topbar">
         <a className="monogram" href="./">
           {config.groom.english[0]} <span>&</span> {config.bride.english[0]}
           <span className="top-date">
@@ -854,7 +900,7 @@ function Invitation() {
             {sound ? <Volume2 size={19} /> : <VolumeX size={19} />}
           </IconButton>
         </div>
-      </header>
+      </header>}
       <main>
         {!locationOnly && (
           <>
@@ -865,6 +911,7 @@ function Invitation() {
                 alt="신랑 신부 웨딩 사진 · 시안용 이미지"
                 fetchPriority="high"
               />
+              <HeroVideo active={!entrance} />
               <div className="hero-shade" />
               {entrance && (
                 <div
@@ -905,8 +952,17 @@ function Invitation() {
                 ))}
               </div>
               <div className="hero-topline">
-                <span>THE WEDDING OF</span>
-                <span>JEJU, KOREA</span>
+                <div className="hero-place">
+                  <IconButton
+                    className={sound ? "sound-on" : ""}
+                    label={sound ? "배경음 끄기" : "배경음 켜기"}
+                    aria-pressed={sound}
+                    onClick={toggleSound}
+                    disabled={audioBusy}
+                  >
+                    {sound ? <Volume2 size={19} /> : <VolumeX size={19} />}
+                  </IconButton>
+                </div>
               </div>
               <div className="hero-content">
                 <p className="hero-script">Together, in every season.</p>

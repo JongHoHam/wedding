@@ -10,6 +10,7 @@ export const config = {
   kakaoJsKey: "38a8993d018421477735f7a0380d0ca1",
   musicUrl: "",
   hero: "./images/hero.jpg",
+  heroVideo: "./videos/wedding.mp4",
   shareImage: "./images/hero.jpg",
   groom: {
     name: "김서준",
