@@ -720,7 +720,7 @@ function Research() {
   );
 }
 
-function HeroVideo({ active }) {
+function HeroVideo({ active, onSettled }) {
   const video = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [ready, setReady] = useState(false);
@@ -728,7 +728,10 @@ function HeroVideo({ active }) {
   const play = () => {
     if (!video.current) return;
     video.current.muted = true;
-    video.current.play().catch(() => setPlaying(false));
+    video.current.play().catch(() => {
+      setPlaying(false);
+      onSettled(true);
+    });
   };
   useEffect(() => {
     if (active) play();
@@ -741,15 +744,19 @@ function HeroVideo({ active }) {
         ref={video}
         className={`hero-video${ready ? " is-playing" : ""}`}
         src={config.heroVideo}
-        poster={config.hero}
         muted
         loop
         playsInline
         preload="auto"
         aria-hidden="true"
-        onPlaying={() => { setReady(true); setPlaying(true); }}
+        onPlaying={() => {
+          setPlaying(true);
+          const reveal = () => { setReady(true); onSettled(true); };
+          if (video.current.requestVideoFrameCallback) video.current.requestVideoFrameCallback(reveal);
+          else requestAnimationFrame(() => requestAnimationFrame(reveal));
+        }}
         onPause={() => setPlaying(false)}
-        onError={() => setFailed(true)}
+        onError={() => { setFailed(true); onSettled(true); }}
       />
       {active && (
         <IconButton
@@ -782,6 +789,8 @@ function Invitation() {
       !window.location.hash &&
       !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
+  const [entranceComplete, setEntranceComplete] = useState(false);
+  const [videoSettled, setVideoSettled] = useState(!config.heroVideo);
   useEffect(() => {
     if (!entrance) return;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -911,15 +920,17 @@ function Invitation() {
                 alt="신랑 신부 웨딩 사진 · 시안용 이미지"
                 fetchPriority="high"
               />
-              <HeroVideo active={!entrance} />
+              <HeroVideo active={!entrance || entranceComplete} onSettled={setVideoSettled} />
               <div className="hero-shade" />
               {entrance && (
                 <div
-                  className="wedding-entrance"
+                  className={`wedding-entrance${entranceComplete && videoSettled ? " is-leaving" : ""}`}
                   data-testid="wedding-entrance"
                   style={{ "--entrance-clear-delay": `${0.5 + Array.from(entranceText).length * 0.14 + 1.4}s` }}
                   onAnimationEnd={(event) => {
-                    if (event.target === event.currentTarget && event.animationName === "entrance-clear") setEntrance(false);
+                    if (event.target !== event.currentTarget) return;
+                    if (event.animationName === "entrance-await") setEntranceComplete(true);
+                    if (event.animationName === "entrance-clear") setEntrance(false);
                   }}
                 >
                   <p aria-label={entranceText}>
@@ -933,7 +944,7 @@ function Invitation() {
                       </span>
                     ))}
                   </p>
-                  <IconButton label="진입 효과 건너뛰기" onClick={() => setEntrance(false)}>
+                  <IconButton label="진입 효과 건너뛰기" onClick={() => setEntranceComplete(true)}>
                     <X size={18} />
                   </IconButton>
                 </div>

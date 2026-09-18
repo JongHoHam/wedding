@@ -178,7 +178,6 @@ section[id] {
   object-fit: cover;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.6s ease;
 }
 .hero-video.is-playing {
   opacity: 1;
@@ -1387,7 +1386,14 @@ section[id] {
   background: rgb(255 255 255 / 72%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  animation: entrance-clear 0.8s var(--entrance-clear-delay) ease both;
+  animation: entrance-await 0s var(--entrance-clear-delay) both;
+}
+.wedding-entrance.is-leaving {
+  animation: entrance-clear 0.8s ease both;
+}
+@keyframes entrance-await {
+  from { opacity: 1; }
+  to { opacity: 1; }
 }
 .wedding-entrance p {
   padding: 24px;
