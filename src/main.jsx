@@ -791,6 +791,14 @@ function Invitation() {
   );
   const [entranceComplete, setEntranceComplete] = useState(false);
   const [videoSettled, setVideoSettled] = useState(!config.heroVideo);
+  const [heroVisible, setHeroVisible] = useState(!locationOnly);
+  useEffect(() => {
+    const hero = document.querySelector(".hero");
+    if (!hero) return;
+    const observer = new IntersectionObserver(([entry]) => setHeroVisible(entry.isIntersecting));
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
   useEffect(() => {
     if (!entrance) return;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -1191,7 +1199,7 @@ function Invitation() {
           </div>
         )}
       </main>
-      <nav className="bottom-nav" aria-label="청첩장 바로가기">
+      <nav className="bottom-nav" aria-label="청첩장 바로가기" hidden={heroVisible}>
         <a href={locationOnly ? "./#date" : "#date"}>
           <CalendarPlus size={17} />
           <span>예식일</span>

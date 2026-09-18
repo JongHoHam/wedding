@@ -64,3 +64,19 @@ test('both airport buses display the bundled official timetable image', async ()
     assert.ok(image.readUInt32BE(20) >= 1600);
   }
 });
+
+test('gallery includes all 29 supplied photos without replacing the hero or closing image', async () => {
+  assert.equal(config.gallery.length, 29);
+  assert.equal(new Set(config.gallery.map(photo => photo.src)).size, 29);
+  assert.equal(config.gallery.filter(photo => /\/DSCF\d+\.JPG$/.test(photo.src)).length, 28);
+  assert.ok(config.gallery.at(-1).src.endsWith('P20260517_214302000_DFD2D9ED-B33A-49E4-ADD1-25ED0DB15000.JPG'));
+  assert.equal(config.hero, './images/hero.jpg');
+  assert.equal(config.shareImage, './images/hero.jpg');
+  for (const photo of config.gallery) {
+    const image = await readFile(new URL(`../public/${photo.src}`, import.meta.url));
+    assert.equal(image.subarray(0, 3).toString('hex'), 'ffd8ff');
+    assert.ok(photo.alt);
+  }
+  const closing = await readFile(new URL('../public/images/moment-1.jpg', import.meta.url));
+  assert.equal(closing.subarray(0, 3).toString('hex'), 'ffd8ff');
+});

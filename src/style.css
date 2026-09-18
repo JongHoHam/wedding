@@ -256,7 +256,7 @@ section[id] {
 }
 .hero-bottom {
   position: absolute;
-  bottom: calc(86px + env(safe-area-inset-bottom));
+  bottom: calc(20px + env(safe-area-inset-bottom));
   left: 5%;
   right: 5%;
   display: flex;
@@ -1009,6 +1009,9 @@ section[id] {
   font-size: 10px;
   min-height: 42px;
   justify-content: center;
+}
+.bottom-nav[hidden] {
+  display: none;
 }
 .bottom-nav a:hover,
 .bottom-nav button:hover {

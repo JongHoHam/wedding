@@ -6,7 +6,7 @@ export default function PhotoGallery({ photos, openViewer }) {
   const rail = useRef(null);
   const drag = useRef(null);
   const suppressClick = useRef(false);
-  const gallery = photos.slice(0, 20);
+  const gallery = photos;
   const extraCount = Math.max(0, gallery.length - 5);
 
   useEffect(() => {

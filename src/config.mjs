@@ -54,16 +54,18 @@ export const config = {
     phone: "064-738-6400",
   },
   gallery: [
-    { src: "./images/hero.jpg", alt: "함께한 웨딩의 순간 · 샘플 사진" },
-    { src: "./images/moment-1.jpg", alt: "웨딩의 따뜻한 기억 · 샘플 사진" },
-    { src: "./images/moment-2.jpg", alt: "서로를 향한 약속 · 샘플 사진" },
-    { src: "./images/moment-3.jpg", alt: "꽃과 함께한 하루 · 샘플 사진" },
-    { src: "./images/moment-4.jpg", alt: "설렘이 머무는 장면 · 샘플 사진" },
-    ...Array.from({ length: 15 }, (_, index) => ({
-      src: `./images/moment-${index + 5}.jpg`,
-      alt: `웨딩과 꽃의 순간 ${index + 6} · 샘플 사진`,
-    })),
-  ],
+    "DSCF0028.JPG", "DSCF0071.JPG", "DSCF0236.JPG", "DSCF0279.JPG",
+    "DSCF0335.JPG", "DSCF0348.JPG", "DSCF0501.JPG", "DSCF0568.JPG",
+    "DSCF7013.JPG", "DSCF7151.JPG", "DSCF7326.JPG", "DSCF7488.JPG",
+    "DSCF7649.JPG", "DSCF7670.JPG", "DSCF7747.JPG", "DSCF7802.JPG",
+    "DSCF7901.JPG", "DSCF8039.JPG", "DSCF8068.JPG", "DSCF8558.JPG",
+    "DSCF9117.JPG", "DSCF9218.JPG", "DSCF9266.JPG", "DSCF9468.JPG",
+    "DSCF9478.JPG", "DSCF9786.JPG", "DSCF9950.JPG", "DSCF9986.JPG",
+    "P20260517_214302000_DFD2D9ED-B33A-49E4-ADD1-25ED0DB15000.JPG",
+  ].map((filename, index) => ({
+    src: `./images/${filename}`,
+    alt: `함께한 웨딩의 순간 ${index + 1}`,
+  })),
   accounts: [
     { side: "groom", role: "신랑", name: "김서준", bank: "", number: "" },
     { side: "groom", role: "아버지", name: "김정호", bank: "", number: "" },
