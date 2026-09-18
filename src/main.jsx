@@ -91,7 +91,7 @@ function Modal({ title, onClose, children, className = "" }) {
     return () => {
       document.body.style.overflow = previous;
       dialog.close();
-      priorFocus?.focus();
+      priorFocus?.focus({ preventScroll: true });
     };
   }, []);
   return (
@@ -299,7 +299,7 @@ function Directions({ toast, openViewer }) {
         <p>{config.venue.detail}</p>
         <p>{config.venue.address}</p>
         {!config.venue.verified && (
-          <small className="pending">식장 위치·홀·주차 정보 최종 확인 전</small>
+          <small className="pending">주차 혜택·하차 입구 최종 확인 전</small>
         )}
       </div>
       <VenueMap venue={config.venue} route={route} />
@@ -359,7 +359,7 @@ function Directions({ toast, openViewer }) {
                   <small>
                     <Clock size={12} />
                     {item.minutes[0]}~{item.minutes[1]}분 ·{" "}
-                    {item.verified || item.roadGeometry ? "여유시간 포함 예상" : "여유시간 포함 예시"}
+                    예상 소요시간
                   </small>
                 </span>
                 <ChevronDown
@@ -372,8 +372,8 @@ function Directions({ toast, openViewer }) {
                   {!item.verified && (
                     <p className="pending">
                       {item.roadGeometry
-                        ? `도로 기준 약 ${item.distanceKm}km. 정체·주차 여유를 포함한 예상으로 실시간 교통은 반영되지 않습니다. 최종 하차 입구는 확인 중입니다.`
-                        : "탑승·하차 안내는 ICC 공식 자료 기준입니다. 지도상의 노선과 정류장 좌표는 시안이며, 대기·도보를 포함한 시간은 예시입니다."}
+                        ? `도로 기준 약 ${item.distanceKm}km. 예상 소요시간은 실시간 교통을 반영하지 않으며 정체·주차 상황에 따라 더 걸릴 수 있습니다. 최종 하차 입구는 확인 중입니다.`
+                        : "탑승·하차 안내는 ICC 공식 자료 기준입니다. 지도상의 노선과 정류장 좌표는 시안이며, 대기·도보에 따라 시간이 추가될 수 있습니다."}
                     </p>
                   )}
                   <ol style={{ "--route-color": item.color }}>
@@ -382,7 +382,7 @@ function Directions({ toast, openViewer }) {
                     ))}
                   </ol>
                   <p className="road-names">{item.roads.join(" → ")}</p>
-                  {mode === "bus" && <p className="fine-print">공식 주행시간 60~70분에 대기·도보 여유를 더해 90~120분을 권장합니다. 실제 도착시간을 보장하지 않습니다.</p>}
+                  {mode === "bus" && <p className="fine-print">예상 소요시간은 60~90분입니다. 대기·도보·교통 상황에 따라 더 걸릴 수 있으며 실제 도착시간을 보장하지 않습니다.</p>}
                   {mode === "bus" && (
                     <div className="timetable">
                       {item.timetable ? (
@@ -411,6 +411,13 @@ function Directions({ toast, openViewer }) {
                         </button>
                       ) : (
                         <div className="timetable-placeholder" role="img" aria-label={`${item.name} 시간표 이미지 준비 중`} />
+                      )}
+                      {item.timetable && (
+                        <>
+                          <p className="fine-print">600·601번 통합 시간표 · 공항 출발<br />원본 시행일 2024.08.01 · 확인일 2026.09.18</p>
+                          <a className="text-link" href="https://bus.jeju.go.kr/publicTrafficInformation/generalBusSchedule?viewtype=2" target="_blank" rel="noreferrer">제주버스정보시스템 최신 시간표 <ExternalLink size={14} /></a>
+                          <a className="text-link" href="https://bus.jeju.go.kr/data/schedule/downScheduleExcel?gscheduleId=405067" target="_blank" rel="noreferrer">공식 시간표 Excel 원본 <ExternalLink size={14} /></a>
+                        </>
                       )}
                     </div>
                   )}
@@ -711,6 +718,7 @@ function Research() {
 }
 
 function Invitation() {
+  const entranceText = "소중한 분들을 초대합니다.";
   const [sound, setSound] = useState(false);
   const [audioBusy, setAudioBusy] = useState(false);
   const player = useRef(null);
@@ -734,11 +742,9 @@ function Invitation() {
     const onMotionChange = () => {
       if (motion.matches) finish();
     };
-    const timer = setTimeout(finish, 3600);
     motion.addEventListener("change", onMotionChange);
     window.addEventListener("hashchange", finish);
     return () => {
-      clearTimeout(timer);
       motion.removeEventListener("change", onMotionChange);
       window.removeEventListener("hashchange", finish);
     };
@@ -860,9 +866,16 @@ function Invitation() {
               />
               <div className="hero-shade" />
               {entrance && (
-                <div className="wedding-entrance" data-testid="wedding-entrance">
-                  <p aria-label="소중한 분들을 초대합니다.">
-                    {Array.from("소중한 분들을 초대합니다.").map((letter, index) => (
+                <div
+                  className="wedding-entrance"
+                  data-testid="wedding-entrance"
+                  style={{ "--entrance-clear-delay": `${0.5 + Array.from(entranceText).length * 0.14 + 1.4}s` }}
+                  onAnimationEnd={(event) => {
+                    if (event.target === event.currentTarget && event.animationName === "entrance-clear") setEntrance(false);
+                  }}
+                >
+                  <p aria-label={entranceText}>
+                    {Array.from(entranceText).map((letter, index) => (
                       <span
                         key={index}
                         aria-hidden="true"

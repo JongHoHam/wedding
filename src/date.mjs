@@ -23,7 +23,7 @@ function escapeICS(value) {
 
 export function calendarFile(config) {
   const stamp = (value) => new Date(value).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Our Wedding//KO', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT', `UID:${stamp(config.date)}-wedding@invitation.local`, `DTSTAMP:${stamp(Date.now())}`, `DTSTART:${stamp(config.date)}`, `DTEND:${stamp(Date.parse(config.date) + 7200000)}`, `SUMMARY:${escapeICS(config.title)}`, `LOCATION:${escapeICS(config.venue.name + ' ' + config.venue.address)}`, 'END:VEVENT', 'END:VCALENDAR'];
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Our Wedding//KO', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT', `UID:${stamp(config.date)}-wedding@invitation.local`, `DTSTAMP:${stamp(Date.now())}`, `DTSTART:${stamp(config.date)}`, `DTEND:${stamp(Date.parse(config.date) + 5 * 60 * 60 * 1000)}`, `SUMMARY:${escapeICS(config.title)}`, `LOCATION:${escapeICS(config.venue.name + ' ' + config.venue.detail + ' ' + config.venue.address)}`, 'END:VEVENT', 'END:VCALENDAR'];
   return lines.map((line) => {
     const folded = [];
     let current = '';

@@ -42,6 +42,7 @@ export default function PhotoGallery({ photos, openViewer }) {
     suppressClick.current = false;
     drag.current = {
       pointerId: event.pointerId,
+      native: event.pointerType === "touch",
       x: event.clientX,
       y: event.clientY,
       scrollLeft: event.currentTarget.scrollLeft,
@@ -52,6 +53,10 @@ export default function PhotoGallery({ photos, openViewer }) {
     const gesture = drag.current;
     if (!gesture || gesture.pointerId !== event.pointerId) return;
     const distance = event.clientX - gesture.x;
+    if (gesture.native) {
+      if (Math.hypot(distance, event.clientY - gesture.y) > 8) suppressClick.current = true;
+      return;
+    }
     if (!gesture.active) {
       const vertical = Math.abs(event.clientY - gesture.y);
       if (vertical > 8 && vertical > Math.abs(distance)) {

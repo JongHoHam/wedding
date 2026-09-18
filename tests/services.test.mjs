@@ -14,6 +14,11 @@ test('share has two separate targets and absolute image URL under repository sub
 
 test('navigation links keep longitude and latitude in provider-specific order', () => {
   const links = mapLinks(config.venue);
+  assert.equal(config.venue.name, '중문컨벤션센터');
+  assert.equal(config.venue.detail, '5층 오션뷰 홀');
+  for (const provider of ['naver', 'naverApp', 'kakao', 'tmap', 'apple', 'android']) {
+    assert.ok(decodeURIComponent(links[provider]).includes('중문컨벤션센터'));
+  }
   assert.ok(links.tmap.includes(`goalx=${config.venue.lng}&goaly=${config.venue.lat}`));
   assert.ok(links.kakao.endsWith(`,${config.venue.lat},${config.venue.lng}`));
   assert.ok(links.android.startsWith(`geo:${config.venue.lat},${config.venue.lng}`));
@@ -37,12 +42,25 @@ test('demo never supplies callable personal numbers or transferable accounts', (
   }
 });
 
-test('car route contains road-level coordinates and conservative time allowance', () => {
+test('routes contain road geometry and the requested travel estimates', () => {
   const route = config.routes.find(item => item.id === 'car');
   assert.equal(route.roadGeometry, true);
   assert.ok(route.points.length > 500);
   assert.ok(route.roads.includes('평화로'));
-  assert.ok(route.minutes[0] > route.engineMinutes);
+  assert.deepEqual(route.minutes, [40, 60]);
+  for (const bus of config.routes.filter(item => item.mode === 'bus')) {
+    assert.deepEqual(bus.minutes, [60, 90]);
+  }
   assert.ok(route.points.every(([lat, lng]) => lat > 33 && lat < 34 && lng > 126 && lng < 127));
   assert.deepEqual(config.routes.filter(item => item.mode === 'bus').map(item => item.id), ['bus600', 'bus601']);
+});
+
+test('both airport buses display the bundled official timetable image', async () => {
+  for (const route of config.routes.filter(item => item.mode === 'bus')) {
+    assert.equal(route.timetable, './images/bus-600-601.png');
+    const image = await readFile(new URL(`../public/${route.timetable}`, import.meta.url));
+    assert.equal(image.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+    assert.ok(image.readUInt32BE(16) >= 1600);
+    assert.ok(image.readUInt32BE(20) >= 1600);
+  }
 });

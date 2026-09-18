@@ -12,8 +12,10 @@ test('calendar is independent of browser timezone', () => {
 });
 
 test('ICS exports UTC with escaped fields and byte-safe folding', () => {
-  const text = calendarFile({ date: '2027-05-22T12:00:00+09:00', title: 'Wedding, together', venue: { name: '제주'.repeat(35), address: 'Hall; room\n2' } });
+  const text = calendarFile({ date: '2027-05-22T12:00:00+09:00', title: 'Wedding, together', venue: { name: '제주'.repeat(35), detail: '5층 오션뷰 홀', address: 'Hall; room\n2' } });
   assert.match(text, /DTSTART:20270522T030000Z/);
+  assert.match(text, /DTEND:20270522T080000Z/);
+  assert.ok(text.replace(/\r\n /g, '').includes('5층 오션뷰 홀'));
   assert.match(text, /SUMMARY:Wedding\\, together/);
   assert.ok(text.split('\r\n').every((line) => Buffer.byteLength(line) <= 75));
   assert.match(text, /Hall\\; room\\n2/);

@@ -23,7 +23,7 @@
   box-sizing: border-box;
 }
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   scroll-padding-top: 76px;
 }
 body {
@@ -473,8 +473,10 @@ section[id] {
   object-fit: cover;
   transition: transform 0.5s;
 }
-.gallery-item:hover img {
-  transform: scale(1.035);
+@media (hover: hover) and (pointer: fine) {
+  .gallery-item:hover img {
+    transform: scale(1.035);
+  }
 }
 .gallery-item > span {
   position: absolute;
@@ -509,11 +511,11 @@ section[id] {
 }
 .gallery-rail {
   display: flex;
-  touch-action: pan-y pinch-zoom;
+  touch-action: pan-x pan-y pinch-zoom;
   user-select: none;
   gap: 12px;
   overflow-x: auto;
-  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
   scrollbar-width: thin;
   scrollbar-color: var(--green) transparent;
   padding-bottom: 12px;
@@ -521,11 +523,7 @@ section[id] {
 .gallery-slide {
   cursor: grab;
   flex: 0 0 38%;
-  scroll-snap-align: start;
   border-radius: 4px;
-}
-.gallery-rail[data-dragging="true"] {
-  scroll-snap-type: none;
 }
 .gallery-rail[data-dragging="true"],
 .gallery-rail[data-dragging="true"] .gallery-slide {
@@ -1191,13 +1189,10 @@ section[id] {
   padding: 0 24px 120px;
 }
 .reveal {
-  transition:
-    opacity 0.8s,
-    transform 0.8s;
+  transition: opacity 0.4s;
 }
 .reveal:not(.revealed) {
   opacity: 0.6;
-  transform: translateY(14px);
 }
 .research-page {
   background: #fafbf9;
@@ -1347,7 +1342,7 @@ section[id] {
   background: rgb(255 255 255 / 72%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  animation: entrance-clear 1s 2.5s ease both;
+  animation: entrance-clear 0.8s var(--entrance-clear-delay) ease both;
 }
 .wedding-entrance p {
   padding: 24px;
@@ -1357,8 +1352,9 @@ section[id] {
   text-align: center;
 }
 .wedding-entrance p span {
+  display: inline-block;
   white-space: pre-wrap;
-  animation: entrance-letter 0.01s var(--letter-delay) step-end both;
+  animation: entrance-letter 0.18s var(--letter-delay) ease-out both;
 }
 .wedding-entrance .icon-button {
   position: absolute;
@@ -1397,8 +1393,6 @@ section[id] {
   from { opacity: 1; }
   to {
     opacity: 0;
-    backdrop-filter: blur(0);
-    -webkit-backdrop-filter: blur(0);
   }
 }
 @keyframes entrance-petal {
