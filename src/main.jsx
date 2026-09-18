@@ -34,6 +34,7 @@ import { calendarDays, countdown, calendarFile } from "./date.mjs";
 import { createMusic, loadKakao, mapLinks, sharePayload } from "./services.mjs";
 import VenueMap from "./Map.jsx";
 import PhotoGallery from "./PhotoGallery.jsx";
+import { stabilizeHeroViewport } from "./viewport.mjs";
 import "./style.css";
 
 const links = mapLinks(config.venue);
@@ -1165,6 +1166,9 @@ function Invitation() {
     </ToastContext.Provider>
   );
 }
+
+const releaseHeroViewport = stabilizeHeroViewport(window);
+if (import.meta.hot) import.meta.hot.dispose(releaseHeroViewport);
 
 createRoot(document.getElementById("root")).render(
   new URLSearchParams(window.location.search).get("view") === "research" ? (
