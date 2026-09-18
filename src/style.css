@@ -1748,6 +1748,7 @@ section[id] {
   font-size: 12px;
 }
 @media (min-width: 701px) {
+  .closing > img { object-position: center 50%; }
   .invitation { padding-top: 42px; }
 }
 @media (max-height: 500px) {

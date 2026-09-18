@@ -1159,8 +1159,8 @@ function Invitation() {
             </section>
             <section className="closing">
               <img
-                src="./images/moment-1.jpg"
-                alt="웨딩의 따뜻한 순간 · 시안용 사진"
+                src="./images/DSCF5881.jpg"
+                alt="함께한 웨딩의 따뜻한 순간"
                 loading="lazy"
               />
               <div>

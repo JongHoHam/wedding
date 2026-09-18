@@ -34,6 +34,9 @@ export function mergePrivateConfig(base, raw, { required = false } = {}) {
     bride: { ...base.bride, ...values.bride },
     demo: false,
   };
+  if (['./images/hero.jpg', 'images/hero.jpg', `${merged.siteUrl}images/hero.jpg`].includes(values.shareImage)) {
+    merged.shareImage = base.shareImage;
+  }
   for (const side of ['groom', 'bride']) {
     if (values[side]?.name) {
       if (!values[side].short) merged[side].short = values[side].name;

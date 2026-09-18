@@ -11,7 +11,7 @@ export const config = {
   musicUrl: "",
   hero: "./images/hero.jpg",
   heroVideo: "./videos/wedding.mp4",
-  shareImage: "./images/hero.jpg",
+  shareImage: "./images/DSCF5872.jpg",
   groom: {
     name: "김서준",
     short: "서준",
