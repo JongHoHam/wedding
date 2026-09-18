@@ -293,7 +293,7 @@ function Directions({ toast, openViewer }) {
     }
   };
   return (
-    <section id="location" className="location section-pad">
+    <section id="location" className="location section-pad reveal">
       <SectionTitle label="LOCATION">오시는 길</SectionTitle>
       <div className="venue-title">
         <h3>{config.venue.name}</h3>
