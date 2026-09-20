@@ -1096,8 +1096,7 @@ section[id] {
 .viewer-track, .viewer-thumbnail-track { display: flex; }
 .viewer-slide { flex: 0 0 100%; min-width: 0; }
 .viewer-photo { display: block; padding: 0; }
-.viewer-photo img { width: 100%; height: 100%; object-fit: cover; user-select: none; }
-.fit-photo .viewer-photo img { object-fit: contain; }
+.viewer-photo img { width: 100%; height: 100%; object-fit: contain; user-select: none; }
 .viewer-overlay { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.2s ease; }
 .ui-hidden .viewer-overlay { opacity: 0; visibility: hidden; }
 .viewer-overlay .icon-button {

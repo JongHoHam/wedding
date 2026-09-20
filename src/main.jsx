@@ -22,7 +22,6 @@ import {
   VolumeX,
   X,
   ZoomIn,
-  ZoomOut,
   Car,
   Bus,
   Clock,
@@ -132,7 +131,6 @@ function Modal({ title, onClose, children, className = "", hideHeader = false })
 function GalleryViewer({ initial, photos, onClose }) {
   const [index, setIndex] = useState(initial);
   const [uiVisible, setUiVisible] = useState(true);
-  const [fit, setFit] = useState(photos.length === 1);
   const reducedMotion = useRef(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const [viewport, carousel] = useEmblaCarousel({ loop: photos.length > 1, startIndex: initial, duration: reducedMotion.current ? 0 : 28 });
   const [thumbnails, thumbnailCarousel] = useEmblaCarousel({ loop: photos.length > 5, startIndex: initial, align: "center", containScroll: false, duration: reducedMotion.current ? 0 : 22 });
@@ -183,7 +181,7 @@ function GalleryViewer({ initial, photos, onClose }) {
     <Modal title="우리의 순간" onClose={onClose} className="viewer" hideHeader>
       <div
         ref={stage}
-        className={`viewer-stage${uiVisible ? "" : " ui-hidden"}${fit ? " fit-photo" : ""}`}
+        className={`viewer-stage${uiVisible ? "" : " ui-hidden"}`}
         tabIndex={0}
         role="region"
         aria-label="확대 사진"
@@ -215,7 +213,6 @@ function GalleryViewer({ initial, photos, onClose }) {
           <div className="viewer-top">
             <span className="viewer-counter" aria-live="polite">{pad(index + 1)} / {pad(photos.length)}</span>
             <div>
-              <IconButton label={fit ? "화면 채우기" : "사진 전체 보기"} onClick={() => setFit(current => !current)}>{fit ? <ZoomIn /> : <ZoomOut />}</IconButton>
               <IconButton label="닫기" onClick={onClose}><X size={23} /></IconButton>
             </div>
           </div>
