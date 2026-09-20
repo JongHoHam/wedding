@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import useEmblaCarousel from "embla-carousel-react";
 import {
   ArrowDown,
   ArrowLeft,
@@ -15,9 +16,7 @@ import {
   MessageCircle,
   Navigation,
   ParkingCircle,
-  Pause,
   Phone,
-  Play,
   Share2,
   Volume2,
   VolumeX,
@@ -82,7 +81,7 @@ function SectionTitle({ label, children }) {
   );
 }
 
-function Modal({ title, onClose, children, className = "" }) {
+function Modal({ title, onClose, children, className = "", hideHeader = false }) {
   const ref = useRef(null);
   const notification = useContext(ToastContext);
   useEffect(() => {
@@ -117,12 +116,12 @@ function Modal({ title, onClose, children, className = "" }) {
       }}
     >
       <div className="modal-inner">
-        <header className="modal-header">
+        {!hideHeader && <header className="modal-header">
           <h2>{title}</h2>
           <IconButton label="닫기" onClick={onClose}>
             <X size={21} />
           </IconButton>
-        </header>
+        </header>}
         {children}
         {notification && <p className="modal-notification" role="status">{notification}</p>}
       </div>
@@ -132,56 +131,110 @@ function Modal({ title, onClose, children, className = "" }) {
 
 function GalleryViewer({ initial, photos, onClose }) {
   const [index, setIndex] = useState(initial);
-  const [zoom, setZoom] = useState(false);
-  const startTouch = useRef(null);
-  const move = (delta) => {
-    setIndex((current) => (current + delta + photos.length) % photos.length);
-    setZoom(false);
+  const [uiVisible, setUiVisible] = useState(true);
+  const [fit, setFit] = useState(photos.length === 1);
+  const reducedMotion = useRef(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const [viewport, carousel] = useEmblaCarousel({ loop: photos.length > 1, startIndex: initial, duration: reducedMotion.current ? 0 : 28 });
+  const [thumbnails, thumbnailCarousel] = useEmblaCarousel({ loop: photos.length > 5, startIndex: initial, align: "center", containScroll: false, duration: reducedMotion.current ? 0 : 22 });
+  const stage = useRef(null);
+  const toggleUi = () => {
+    stage.current?.focus({ preventScroll: true });
+    setUiVisible(current => !current);
   };
   useEffect(() => {
-    const listener = (event) => {
-      if (event.key === "ArrowLeft") {
-        setIndex((current) => (current - 1 + photos.length) % photos.length);
-        setZoom(false);
-      }
-      if (event.key === "ArrowRight") {
-        setIndex((current) => (current + 1) % photos.length);
-        setZoom(false);
-      }
+    if (!carousel || !thumbnailCarousel) return;
+    const select = () => {
+      const selected = carousel.selectedScrollSnap();
+      setIndex(selected);
+      thumbnailCarousel.scrollTo(selected);
     };
-    document.addEventListener("keydown", listener);
-    return () => document.removeEventListener("keydown", listener);
-  }, [photos.length]);
+    const selectThumbnail = () => carousel.scrollTo(thumbnailCarousel.selectedScrollSnap());
+    carousel.on("select", select);
+    thumbnailCarousel.on("select", selectThumbnail);
+    select();
+    return () => {
+      carousel.off("select", select);
+      thumbnailCarousel.off("select", selectThumbnail);
+    };
+  }, [carousel, thumbnailCarousel]);
+  useEffect(() => {
+    if (!carousel || !thumbnailCarousel) return;
+    const handlers = [carousel, thumbnailCarousel].map(api => {
+      let distance = 0;
+      let last = 0;
+      const wheel = event => {
+        if (event.ctrlKey) return;
+        event.preventDefault();
+        const now = performance.now();
+        if (now - last < 450) return;
+        distance += (Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY) * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1);
+        if (Math.abs(distance) < 35) return;
+        if (distance > 0) api.scrollNext();
+        else api.scrollPrev();
+        last = now;
+        distance = 0;
+      };
+      api.rootNode().addEventListener("wheel", wheel, { passive: false });
+      return () => api.rootNode().removeEventListener("wheel", wheel);
+    });
+    return () => handlers.forEach(dispose => dispose());
+  }, [carousel, thumbnailCarousel]);
   return (
-    <Modal title="우리의 순간" onClose={onClose} className="viewer">
+    <Modal title="우리의 순간" onClose={onClose} className="viewer" hideHeader>
       <div
-        className={`viewer-image ${zoom ? "zoomed" : ""}`}
-        onTouchStart={(event) => {
-          startTouch.current = event.touches[0].clientX;
-        }}
-        onTouchEnd={(event) => {
-          const distance = event.changedTouches[0].clientX - startTouch.current;
-          if (!zoom && Math.abs(distance) > 50) move(distance > 0 ? -1 : 1);
+        ref={stage}
+        className={`viewer-stage${uiVisible ? "" : " ui-hidden"}${fit ? " fit-photo" : ""}`}
+        tabIndex={0}
+        role="region"
+        aria-label="확대 사진"
+        onKeyDown={event => {
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.preventDefault();
+            if (event.key === "ArrowLeft") carousel?.scrollPrev();
+            else carousel?.scrollNext();
+          }
+          if (event.key === "Tab") setUiVisible(true);
+          if (event.target === event.currentTarget && ["Enter", " "].includes(event.key)) {
+            event.preventDefault();
+            toggleUi();
+          }
         }}
       >
-        <img src={photos[index].src} alt={photos[index].alt} />
-      </div>
-      <div className="viewer-controls">
-        <IconButton label="이전 사진" onClick={() => move(-1)}>
-          <ChevronLeft />
-        </IconButton>
-        <span aria-live="polite">
-          {pad(index + 1)} / {pad(photos.length)}
-        </span>
-        <IconButton
-          label={zoom ? "사진 축소" : "사진 확대"}
-          onClick={() => setZoom(!zoom)}
-        >
-          {zoom ? <ZoomOut /> : <ZoomIn />}
-        </IconButton>
-        <IconButton label="다음 사진" onClick={() => move(1)}>
-          <ChevronRight />
-        </IconButton>
+        <div className="viewer-viewport" ref={viewport}>
+          <div className="viewer-track">
+            {photos.map((photo, photoIndex) => (
+              <div className="viewer-slide" key={`${photo.src}-${photoIndex}`} aria-hidden={photoIndex !== index}>
+                <button className="viewer-photo" aria-label="사진 조작 버튼 표시 또는 숨기기" tabIndex={photoIndex === index ? 0 : -1} onClick={toggleUi}>
+                  <img src={photo.src} alt={photo.alt} draggable={false} loading={Math.min(Math.abs(photoIndex - index), photos.length - Math.abs(photoIndex - index)) <= 1 ? "eager" : "lazy"} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="viewer-overlay" inert={!uiVisible} aria-hidden={!uiVisible}>
+          <div className="viewer-top">
+            <span className="viewer-counter" aria-live="polite">{pad(index + 1)} / {pad(photos.length)}</span>
+            <div>
+              <IconButton label={fit ? "화면 채우기" : "사진 전체 보기"} onClick={() => setFit(current => !current)}>{fit ? <ZoomIn /> : <ZoomOut />}</IconButton>
+              <IconButton label="닫기" onClick={onClose}><X size={23} /></IconButton>
+            </div>
+          </div>
+          {photos.length > 1 && <>
+            <IconButton className="viewer-prev" label="이전 사진" onClick={() => carousel?.scrollPrev()}><ChevronLeft /></IconButton>
+            <IconButton className="viewer-next" label="다음 사진" onClick={() => carousel?.scrollNext()}><ChevronRight /></IconButton>
+          </>}
+          <div className="viewer-thumbnails" ref={thumbnails} aria-label="사진 미리보기" hidden={photos.length < 2}>
+            <div className="viewer-thumbnail-track">
+              {photos.map((photo, photoIndex) => (
+                <div className="viewer-thumbnail-slide" key={`${photo.src}-${photoIndex}`}>
+                  <button aria-label={`사진 ${photoIndex + 1} 선택`} aria-current={photoIndex === index ? "true" : undefined} onClick={() => carousel?.scrollTo(photoIndex)}>
+                    <img src={photo.src} alt="" draggable={false} loading="lazy" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </Modal>
   );
@@ -722,14 +775,12 @@ function Research() {
 
 function HeroVideo({ active, onSettled }) {
   const video = useRef(null);
-  const [playing, setPlaying] = useState(false);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const play = () => {
     if (!video.current) return;
     video.current.muted = true;
     video.current.play().catch(() => {
-      setPlaying(false);
       onSettled(true);
     });
   };
@@ -750,23 +801,12 @@ function HeroVideo({ active, onSettled }) {
         preload="auto"
         aria-hidden="true"
         onPlaying={() => {
-          setPlaying(true);
           const reveal = () => { setReady(true); onSettled(true); };
           if (video.current.requestVideoFrameCallback) video.current.requestVideoFrameCallback(reveal);
           else requestAnimationFrame(() => requestAnimationFrame(reveal));
         }}
-        onPause={() => setPlaying(false)}
         onError={() => { setFailed(true); onSettled(true); }}
       />
-      {active && (
-        <IconButton
-          className="hero-video-control"
-          label={playing ? "영상 일시정지" : "영상 재생"}
-          onClick={() => playing ? video.current?.pause() : play()}
-        >
-          {playing ? <Pause size={18} /> : <Play size={18} />}
-        </IconButton>
-      )}
     </>
   );
 }
