@@ -18,7 +18,7 @@ export const config = {
   },
   hero: "./images/wedding-first-frame.jpg",
   heroVideo: "./videos/wedding.mp4",
-  shareImage: "./images/DSCF5872.jpg",
+  shareImage: "./images/share-p20260405-centered.jpg",
   groom: {
     name: "김서준",
     short: "서준",

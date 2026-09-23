@@ -34,7 +34,8 @@ export function mergePrivateConfig(base, raw, { required = false } = {}) {
     bride: { ...base.bride, ...values.bride },
     demo: false,
   };
-  if (['./images/hero.jpg', 'images/hero.jpg', `${merged.siteUrl}images/hero.jpg`].includes(values.shareImage)) {
+  const previousShareImages = ['hero.jpg', 'DSCF5872.jpg', '(thumbnail)P20260405_183943000_93EB75D6-7198-42B3-9590-42593FFF470F.JPG'];
+  if (previousShareImages.some(filename => [`./images/${filename}`, `images/${filename}`, `${merged.siteUrl}images/${filename}`].includes(values.shareImage))) {
     merged.shareImage = base.shareImage;
   }
   for (const side of ['groom', 'bride']) {

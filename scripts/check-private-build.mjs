@@ -36,8 +36,8 @@ try {
   const assets = await readdir(join(output, 'assets'));
   const javascript = (await Promise.all(assets.filter(file => file.endsWith('.js')).map(file => readFile(join(output, 'assets', file), 'utf8')))).join('\n');
   assert.ok(html.includes(fixture.title), 'Private title missing from metadata');
-  assert.ok(html.includes('<meta property="og:image" content="https://example.github.io/wedding/images/DSCF5872.jpg" />'), 'New link preview image missing from built metadata');
-  for (const file of ['DSCF5872.jpg', 'DSCF5881.jpg']) {
+  assert.ok(html.includes('<meta property="og:image" content="https://example.github.io/wedding/images/share-p20260405-centered.jpg" />'), 'New link preview image missing from built metadata');
+  for (const file of ['share-p20260405-centered.jpg', 'DSCF5881.jpg']) {
     assert.ok((await readFile(join(output, 'images', file))).length > 0, 'Requested image missing from build');
   }
   for (const value of [fixture.groom.name, fixture.groom.phone, fixture.accounts[0].number]) {

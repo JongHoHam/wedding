@@ -77,7 +77,7 @@ test('share has two separate targets and absolute image URL under repository sub
   assert.equal(payload.buttons.length, 2);
   assert.equal(payload.buttons[0].link.webUrl, 'https://example.github.io/wedding/');
   assert.equal(payload.buttons[1].link.mobileWebUrl, 'https://example.github.io/wedding/?view=location');
-  assert.equal(payload.content.imageUrl, 'https://example.github.io/wedding/images/DSCF5872.jpg');
+  assert.equal(payload.content.imageUrl, 'https://example.github.io/wedding/images/share-p20260405-centered.jpg');
 });
 
 test('navigation links keep longitude and latitude in provider-specific order', () => {
@@ -145,7 +145,7 @@ test('gallery uses every P-prefixed photo in filename order independently of her
   assert.equal(config.hero, './images/wedding-first-frame.jpg');
   const hero = await readFile(new URL(`../public/${config.hero}`, import.meta.url));
   assert.equal(hero.subarray(0, 3).toString('hex'), 'ffd8ff');
-  assert.equal(config.shareImage, './images/DSCF5872.jpg');
+  assert.equal(config.shareImage, './images/share-p20260405-centered.jpg');
   for (const photo of config.gallery) {
     const image = await readFile(new URL(`../public/${photo.src}`, import.meta.url));
     assert.equal(image.subarray(0, 3).toString('hex'), 'ffd8ff');
@@ -156,15 +156,17 @@ test('gallery uses every P-prefixed photo in filename order independently of her
 });
 
 test('link previews use the new share photo even with the legacy default in private settings', async () => {
-  for (const shareImage of ['./images/hero.jpg', new URL('./images/hero.jpg', config.siteUrl).href, './images/DSCF5872.jpg']) {
+  const previousImages = ['hero.jpg', 'DSCF5872.jpg', '(thumbnail)P20260405_183943000_93EB75D6-7198-42B3-9590-42593FFF470F.JPG'];
+  for (const shareImage of previousImages.flatMap(filename => [`./images/${filename}`, `images/${filename}`, new URL(`./images/${filename}`, config.siteUrl).href]).concat(config.shareImage)) {
     const merged = mergePrivateConfig(config, JSON.stringify({ shareImage }));
-    const expected = new URL('./images/DSCF5872.jpg', config.siteUrl).href;
+    const expected = new URL('./images/share-p20260405-centered.jpg', config.siteUrl).href;
     assert.equal(sharePayload(merged, config.siteUrl).content.imageUrl, expected);
     const html = invitationMetadata('<!-- invitation-metadata:start --><!-- invitation-metadata:end -->', merged);
     assert.ok(html.includes(`<meta property="og:image" content="${expected}" />`));
   }
   const custom = mergePrivateConfig(config, JSON.stringify({ shareImage: 'https://example.com/custom.jpg' }));
   assert.equal(custom.shareImage, 'https://example.com/custom.jpg');
-  const image = await readFile(new URL('../public/images/DSCF5872.jpg', import.meta.url));
+  const image = await readFile(new URL('../public/images/share-p20260405-centered.jpg', import.meta.url));
   assert.equal(image.subarray(0, 3).toString('hex'), 'ffd8ff');
+  assert.ok(image.length > 10000);
 });
