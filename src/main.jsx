@@ -772,15 +772,34 @@ function HeroVideo({ active, onSettled }) {
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const play = () => {
-    if (!video.current) return;
+    if (!active || document.hidden || !video.current || !video.current.paused) return;
     video.current.muted = true;
     video.current.play().catch(() => {
       onSettled(true);
     });
   };
   useEffect(() => {
-    if (active) play();
-    else video.current?.pause();
+    const pause = () => video.current?.pause();
+    const resume = () => {
+      if (active && !document.hidden) play();
+      else pause();
+    };
+    resume();
+    document.addEventListener("visibilitychange", resume);
+    document.addEventListener("click", play);
+    document.addEventListener("touchend", play);
+    window.addEventListener("pageshow", resume);
+    window.addEventListener("focus", resume);
+    window.addEventListener("pagehide", pause);
+    return () => {
+      document.removeEventListener("visibilitychange", resume);
+      document.removeEventListener("click", play);
+      document.removeEventListener("touchend", play);
+      window.removeEventListener("pageshow", resume);
+      window.removeEventListener("focus", resume);
+      window.removeEventListener("pagehide", pause);
+      pause();
+    };
   }, [active]);
   if (failed || !config.heroVideo) return null;
   return (
@@ -815,6 +834,10 @@ function Invitation() {
   const [sound, setSound] = useState(false);
   const [audioBusy, setAudioBusy] = useState(false);
   const player = useRef(null);
+  const musicEnabled = useRef(true);
+  const audioPending = useRef(false);
+  const audioRequest = useRef(0);
+  const pageActive = useRef(!document.hidden);
   const [modal, setModal] = useState(null);
   const [viewer, setViewer] = useState(null);
   const [toastText, setToastText] = useState("");
@@ -865,7 +888,11 @@ function Invitation() {
       setCopyFallback(value);
     }
   };
-  const toggleSound = async () => {
+  const playSound = async (reportError = false) => {
+    if (!musicEnabled.current || !pageActive.current || document.hidden || audioPending.current) return;
+    if (player.current?.paused === false) return;
+    const request = ++audioRequest.current;
+    audioPending.current = true;
     setAudioBusy(true);
     try {
       if (!player.current)
@@ -876,31 +903,68 @@ function Invitation() {
         player.current.loop = true;
         player.current.volume = 0.35;
       }
-      if (sound) {
-        await player.current.pause();
+      await player.current.play();
+      if (request !== audioRequest.current) return;
+      setSound(true);
+    } catch (error) {
+      if (request === audioRequest.current) {
+        if (reportError && error.name !== "AbortError") toast("음악을 재생하지 못했습니다. 다시 눌러 주세요.");
         setSound(false);
-      } else {
-        await player.current.play();
-        setSound(true);
       }
-    } catch {
-      toast("음악을 재생하지 못했습니다. 다시 눌러 주세요.");
-      setSound(false);
     } finally {
-      setAudioBusy(false);
+      if (request === audioRequest.current) {
+        audioPending.current = false;
+        setAudioBusy(false);
+      }
+    }
+  };
+  const pauseSound = () => {
+    audioRequest.current += 1;
+    audioPending.current = false;
+    player.current?.pause();
+    setSound(false);
+    setAudioBusy(false);
+  };
+  const toggleSound = () => {
+    if (sound) {
+      musicEnabled.current = false;
+      pauseSound();
+    } else {
+      musicEnabled.current = true;
+      playSound(true);
     }
   };
   useEffect(() => {
-    const hide = () => {
-      if (document.hidden && player.current) {
-        player.current.pause();
-        setSound(false);
-      }
+    const suspend = () => {
+      pageActive.current = false;
+      pauseSound();
     };
-    document.addEventListener("visibilitychange", hide);
+    const resume = () => {
+      pageActive.current = !document.hidden;
+      if (pageActive.current) playSound();
+      else suspend();
+    };
+    const unlock = (event) => {
+      if (event.target instanceof Element && event.target.closest("[data-sound-toggle]")) return;
+      playSound();
+    };
+    resume();
+    document.addEventListener("visibilitychange", resume);
+    document.addEventListener("click", unlock);
+    document.addEventListener("touchend", unlock);
+    document.addEventListener("keydown", unlock);
+    window.addEventListener("pageshow", resume);
+    window.addEventListener("focus", resume);
+    window.addEventListener("pagehide", suspend);
     return () => {
-      document.removeEventListener("visibilitychange", hide);
-      player.current?.pause();
+      document.removeEventListener("visibilitychange", resume);
+      document.removeEventListener("click", unlock);
+      document.removeEventListener("touchend", unlock);
+      document.removeEventListener("keydown", unlock);
+      window.removeEventListener("pageshow", resume);
+      window.removeEventListener("focus", resume);
+      window.removeEventListener("pagehide", suspend);
+      suspend();
       player.current?.close?.();
       clearTimeout(toastTimer.current);
     };
@@ -950,6 +1014,7 @@ function Invitation() {
             className={sound ? "sound-on" : ""}
             label={sound ? "배경음 끄기" : "배경음 켜기"}
             aria-pressed={sound}
+            data-sound-toggle
             onClick={toggleSound}
             disabled={audioBusy}
           >
@@ -1002,6 +1067,7 @@ function Invitation() {
                     className={sound ? "sound-on" : ""}
                     label={sound ? "배경음 끄기" : "배경음 켜기"}
                     aria-pressed={sound}
+                    data-sound-toggle
                     onClick={toggleSound}
                     disabled={audioBusy}
                   >
@@ -1017,7 +1083,7 @@ function Invitation() {
                   {config.bride.short}
                 </h1>
                 <p className="hero-message">
-                  가장 다정한 날, 우리의 시작에 초대합니다.
+                  오래도록 함께 기억할 순간, 우리의 시작에 초대합니다.
                 </p>
               </div>
               <div className="hero-bottom">
