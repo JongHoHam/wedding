@@ -23,13 +23,30 @@ test('modern Kakao first entry and reload use the same small viewport instead of
   for (const height of [932, 844, 724]) {
     const { browser, properties, listeners, resize } = fixture({ height, userAgent: 'KAKAOTALK', touch: 0 });
     browser.CSS = { supports: (property, value) => property === 'height' && value === '100svh' };
+    let smallHeight = 724;
+    let probes = 0;
+    browser.document.createElement = () => ({
+      style: {},
+      getBoundingClientRect: () => ({ height: smallHeight }),
+      remove: () => { probes--; },
+    });
+    browser.document.documentElement.appendChild = () => { probes++; };
     const cleanup = stabilizeHeroViewport(browser);
-    assert.equal(properties.get('--hero-viewport'), '100svh');
+    assert.equal(properties.get('--hero-viewport'), '724px');
     browser.innerHeight = 400;
+    smallHeight = 900;
     resize();
-    assert.equal(properties.get('--hero-viewport'), '100svh');
-    assert.equal(listeners.size, 0);
+    assert.equal(properties.get('--hero-viewport'), '724px');
+    browser.document.documentElement.clientWidth = 844;
+    smallHeight = 390;
+    resize();
+    assert.equal(properties.get('--hero-viewport'), '390px');
+    smallHeight = 450;
+    resize();
+    assert.equal(properties.get('--hero-viewport'), '390px');
+    assert.equal(probes, 0);
     cleanup();
+    assert.equal(listeners.size, 0);
     assert.equal(properties.size, 0);
   }
 });
