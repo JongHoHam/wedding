@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { mapLinks, sharePayload } from '../src/services.mjs';
 import { config } from '../src/config.mjs';
 import { invitationMetadata, mergePrivateConfig } from '../scripts/private-config.mjs';
@@ -66,11 +66,11 @@ test('both airport buses display the bundled official timetable image', async ()
   }
 });
 
-test('gallery retains all 29 supplied photos independently of hero and share images', async () => {
-  assert.equal(config.gallery.length, 29);
-  assert.equal(new Set(config.gallery.map(photo => photo.src)).size, 29);
-  assert.equal(config.gallery.filter(photo => /\/DSCF\d+\.JPG$/.test(photo.src)).length, 28);
-  assert.ok(config.gallery.at(-1).src.endsWith('P20260517_214302000_DFD2D9ED-B33A-49E4-ADD1-25ED0DB15000.JPG'));
+test('gallery uses every P-prefixed photo in filename order independently of hero and share images', async () => {
+  const photos = (await readdir(new URL('../public/images/', import.meta.url)))
+    .filter(filename => /^p.*\.(jpe?g|png|webp)$/i.test(filename)).sort();
+  assert.equal(photos.length, 16);
+  assert.deepEqual(config.gallery.map(photo => photo.src), photos.map(filename => `./images/${filename}`));
   assert.equal(config.hero, './images/wedding-first-frame.jpg');
   const hero = await readFile(new URL(`../public/${config.hero}`, import.meta.url));
   assert.equal(hero.subarray(0, 3).toString('hex'), 'ffd8ff');
