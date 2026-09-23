@@ -351,9 +351,6 @@ function Directions({ toast, openViewer }) {
         <h3>{config.venue.name}</h3>
         <p>{config.venue.detail}</p>
         <p>{config.venue.address}</p>
-        {!config.venue.verified && (
-          <small className="pending">주차 혜택·하차 입구 최종 확인 전</small>
-        )}
       </div>
       <VenueMap venue={config.venue} route={route} />
       <div className="map-apps">
@@ -425,7 +422,7 @@ function Directions({ toast, openViewer }) {
                   {!item.verified && (
                     <p className="pending">
                       {item.roadGeometry
-                        ? `도로 기준 약 ${item.distanceKm}km. 예상 소요시간은 실시간 교통을 반영하지 않으며 정체·주차 상황에 따라 더 걸릴 수 있습니다. 최종 하차 입구는 확인 중입니다.`
+                        ? `도로 기준 약 ${item.distanceKm}km. 예상 소요시간은 실시간 교통을 반영하지 않으며 정체·주차 상황에 따라 더 걸릴 수 있습니다.`
                         : "탑승·하차 안내는 ICC 공식 자료 기준입니다. 지도상의 노선과 정류장 좌표는 시안이며, 대기·도보에 따라 시간이 추가될 수 있습니다."}
                     </p>
                   )}
