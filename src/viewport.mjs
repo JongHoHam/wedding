@@ -2,6 +2,10 @@ export function stabilizeHeroViewport(browser) {
   const root = browser.document.documentElement;
   const mobile = /Android|iPhone|iPad|iPod|KAKAOTALK/i.test(browser.navigator.userAgent)
     || (browser.navigator.platform === 'MacIntel' && browser.navigator.maxTouchPoints > 1);
+  if (mobile && browser.CSS?.supports('height', '100svh')) {
+    root.style.setProperty('--hero-viewport', '100svh');
+    return () => root.style.removeProperty('--hero-viewport');
+  }
   let width;
   const update = () => {
     const nextWidth = root.clientWidth;

@@ -219,6 +219,7 @@ section[id] {
   --hero-script-size: 33px;
   position: absolute;
   inset: calc(50% - var(--hero-script-size) * 0.7) 20px auto;
+  translate: 0 -33.333333%;
   text-align: center;
   animation: rise-in 1.3s 0.15s both;
   text-shadow: 0 2px 22px #23392b60;
@@ -1727,6 +1728,7 @@ section[id] {
 @media (max-height: 500px) {
   .hero-content {
     --hero-script-size: 22px;
+    translate: none;
     top: 76px;
     bottom: auto;
   }

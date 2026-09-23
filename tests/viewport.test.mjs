@@ -19,6 +19,21 @@ function fixture({ touch = 1, userAgent = 'Android', platform = '', width = 390,
   return { browser, properties, listeners, resize: () => listeners.get('resize')?.() };
 }
 
+test('modern Kakao first entry and reload use the same small viewport instead of transient innerHeight', () => {
+  for (const height of [932, 844, 724]) {
+    const { browser, properties, listeners, resize } = fixture({ height, userAgent: 'KAKAOTALK', touch: 0 });
+    browser.CSS = { supports: (property, value) => property === 'height' && value === '100svh' };
+    const cleanup = stabilizeHeroViewport(browser);
+    assert.equal(properties.get('--hero-viewport'), '100svh');
+    browser.innerHeight = 400;
+    resize();
+    assert.equal(properties.get('--hero-viewport'), '100svh');
+    assert.equal(listeners.size, 0);
+    cleanup();
+    assert.equal(properties.size, 0);
+  }
+});
+
 test('mobile toolbar and keyboard height changes do not resize the hero', () => {
   const { browser, properties, resize } = fixture();
   stabilizeHeroViewport(browser);
