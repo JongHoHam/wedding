@@ -767,16 +767,14 @@ function Research() {
   );
 }
 
-function HeroVideo({ active, onSettled }) {
+function HeroVideo({ active }) {
   const video = useRef(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const play = () => {
     if (!active || document.hidden || !video.current || !video.current.paused) return;
     video.current.muted = true;
-    video.current.play().catch(() => {
-      onSettled(true);
-    });
+    video.current.play().catch(() => {});
   };
   useEffect(() => {
     const pause = () => video.current?.pause();
@@ -819,11 +817,11 @@ function HeroVideo({ active, onSettled }) {
           play();
         }}
         onPlaying={() => {
-          const reveal = () => { setReady(true); onSettled(true); };
+          const reveal = () => setReady(true);
           if (video.current.requestVideoFrameCallback) video.current.requestVideoFrameCallback(reveal);
           else requestAnimationFrame(() => requestAnimationFrame(reveal));
         }}
-        onError={() => { setFailed(true); onSettled(true); }}
+        onError={() => setFailed(true)}
       />
     </>
   );
@@ -852,7 +850,6 @@ function Invitation() {
       !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const [entranceComplete, setEntranceComplete] = useState(false);
-  const [videoSettled, setVideoSettled] = useState(!config.heroVideo);
   const [heroVisible, setHeroVisible] = useState(!locationOnly);
   useEffect(() => {
     const hero = document.querySelector(".hero");
@@ -1032,13 +1029,13 @@ function Invitation() {
                 alt="웨딩 동영상 첫 장면"
                 fetchPriority="high"
               />
-              <HeroVideo active={!entrance || entranceComplete} onSettled={setVideoSettled} />
+              <HeroVideo active={!entrance || entranceComplete} />
               <div className="hero-shade" />
               {entrance && (
                 <div
-                  className={`wedding-entrance${entranceComplete && videoSettled ? " is-leaving" : ""}`}
+                  className={`wedding-entrance${entranceComplete ? " is-leaving" : ""}`}
                   data-testid="wedding-entrance"
-                  style={{ "--entrance-clear-delay": `${0.5 + Array.from(entranceText).length * 0.14 + 1.4}s` }}
+                  style={{ "--entrance-clear-delay": "3s" }}
                   onAnimationEnd={(event) => {
                     if (event.target !== event.currentTarget) return;
                     if (event.animationName === "entrance-await") setEntranceComplete(true);
