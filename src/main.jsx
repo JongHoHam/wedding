@@ -1223,6 +1223,12 @@ function Invitation() {
           </div>
         )}
       </main>
+      {config.musicUrl && config.musicCredit && (
+        <footer className="music-credit" aria-label="음악 출처">
+          <span>Music: <a href={config.musicCredit.source} target="_blank" rel="noreferrer">{config.musicCredit.title}</a> · {config.musicCredit.artist} (incompetech.com)</span>
+          <a href={config.musicCredit.licenseUrl} target="_blank" rel="noreferrer">{config.musicCredit.license}</a>
+        </footer>
+      )}
       <nav className="bottom-nav" aria-label="청첩장 바로가기" hidden={heroVisible}>
         <a href={locationOnly ? "./#date" : "#date"}>
           <CalendarPlus size={17} />

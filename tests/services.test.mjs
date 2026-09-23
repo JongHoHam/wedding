@@ -59,6 +59,19 @@ test('upbeat music schedules 112 BPM melody and accompaniment, pauses and loops 
   assert.equal(audio.state, 'closed');
 });
 
+test('background music uses the original Morning MP3 with attribution', async () => {
+  assert.equal(config.musicUrl, './music/Morning.mp3');
+  assert.equal(config.musicCredit.title, 'Morning');
+  assert.equal(config.musicCredit.artist, 'Kevin MacLeod');
+  assert.equal(config.musicCredit.licenseUrl, 'https://creativecommons.org/licenses/by/4.0/');
+  const music = await readFile(new URL(`../public/${config.musicUrl}`, import.meta.url));
+  assert.ok(music.length > 1000000);
+  assert.ok(music.subarray(0, 3).toString() === 'ID3' || (music[0] === 0xff && (music[1] & 0xe0) === 0xe0));
+  const attribution = await readFile(new URL('../public/music/ATTRIBUTION.txt', import.meta.url), 'utf8');
+  assert.ok(attribution.includes(config.musicCredit.source));
+  assert.ok(attribution.includes(config.musicCredit.artist));
+});
+
 test('share has two separate targets and absolute image URL under repository subpath', () => {
   const payload = sharePayload(config, 'https://example.github.io/wedding/?preview=1#home');
   assert.equal(payload.buttons.length, 2);

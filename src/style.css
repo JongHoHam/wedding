@@ -961,6 +961,21 @@ section[id] {
   font-size: 13px;
   margin-top: 25px;
 }
+.music-credit {
+  padding: 16px 24px calc(90px + env(safe-area-inset-bottom));
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.music-credit > a {
+  display: block;
+}
+.music-credit a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .share-section {
   text-align: center;
   padding: 45px 24px 120px;
