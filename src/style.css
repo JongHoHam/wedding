@@ -254,7 +254,7 @@ section[id] {
   right: 5%;
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 .hero-bottom p {
   font-family: var(--english);
@@ -382,6 +382,20 @@ section[id] {
   font-family: var(--serif);
   font-size: 16px;
   line-height: 2;
+}
+.date-venue {
+  margin-top: 8px;
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 2;
+  word-break: keep-all;
+}
+.date-reception {
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+  word-break: keep-all;
 }
 .calendar {
   max-width: 330px;

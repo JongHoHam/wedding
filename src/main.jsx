@@ -1019,12 +1019,6 @@ function Invitation() {
                 </p>
               </div>
               <div className="hero-bottom">
-                <p>
-                  {dateParts.year}. {pad(dateParts.month)}. {pad(dateParts.day)}
-                  <span>
-                    {timeLabel} · {config.venue.name}
-                  </span>
-                </p>
                 <a href="#invitation" aria-label="초대글 보기">
                   <ArrowDown size={21} />
                 </a>
@@ -1072,6 +1066,10 @@ function Invitation() {
                 {dateLabel}
                 <br />
                 {timeLabel}
+              </p>
+              <p className="date-venue">제주국제컨벤션센터 {config.venue.detail}</p>
+              <p className="date-reception">
+                피로연은 3층 델리지아에서<br />오후 5시까지 운영됩니다.
               </p>
               <div className="calendar">
                 <div className="calendar-month">

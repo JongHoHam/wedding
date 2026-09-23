@@ -15,10 +15,10 @@ test('share has two separate targets and absolute image URL under repository sub
 
 test('navigation links keep longitude and latitude in provider-specific order', () => {
   const links = mapLinks(config.venue);
-  assert.equal(config.venue.name, '중문컨벤션센터');
-  assert.equal(config.venue.detail, '5층 오션뷰 홀');
+  assert.equal(config.venue.name, '제주국제컨벤션센터(ICC jeju)');
+  assert.equal(config.venue.detail, '오션뷰홀 5층');
   for (const provider of ['naver', 'naverApp', 'kakao', 'tmap', 'apple', 'android']) {
-    assert.ok(decodeURIComponent(links[provider]).includes('중문컨벤션센터'));
+    assert.ok(decodeURIComponent(links[provider]).includes('제주국제컨벤션센터(ICC jeju)'));
   }
   assert.ok(links.tmap.includes(`goalx=${config.venue.lng}&goaly=${config.venue.lat}`));
   assert.ok(links.kakao.endsWith(`,${config.venue.lat},${config.venue.lng}`));
