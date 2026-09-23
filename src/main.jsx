@@ -794,6 +794,11 @@ function HeroVideo({ active, onSettled }) {
         playsInline
         preload="auto"
         aria-hidden="true"
+        onEnded={() => {
+          if (!active || !video.current) return;
+          video.current.currentTime = 0;
+          play();
+        }}
         onPlaying={() => {
           const reveal = () => { setReady(true); onSettled(true); };
           if (video.current.requestVideoFrameCallback) video.current.requestVideoFrameCallback(reveal);
