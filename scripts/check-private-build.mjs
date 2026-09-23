@@ -17,7 +17,7 @@ fixture.groom.name = 'BUILD_PRIVATE_SENTINEL_NAME';
 fixture.groom.phone = 'BUILD_PRIVATE_SENTINEL_PHONE';
 fixture.accounts[0].number = 'BUILD_PRIVATE_SENTINEL_ACCOUNT';
 fixture.siteUrl = 'https://example.github.io/wedding/';
-fixture.shareImage = './images/hero.jpg';
+fixture.shareImage = './images/share-p20260405-centered.jpg';
 const run = raw => spawnSync(process.execPath, ['node_modules/vite/bin/vite.js', 'build', '--outDir', output], {
   cwd: root,
   env: { ...process.env, GITHUB_ACTIONS: 'true', REQUIRE_PRIVATE_CONFIG: 'true', WEDDING_PRIVATE_CONFIG: raw },
@@ -36,8 +36,8 @@ try {
   const assets = await readdir(join(output, 'assets'));
   const javascript = (await Promise.all(assets.filter(file => file.endsWith('.js')).map(file => readFile(join(output, 'assets', file), 'utf8')))).join('\n');
   assert.ok(html.includes(fixture.title), 'Private title missing from metadata');
-  assert.ok(html.includes('<meta property="og:image" content="https://example.github.io/wedding/images/share-p20260405-centered.jpg" />'), 'New link preview image missing from built metadata');
-  for (const file of ['share-p20260405-centered.jpg', 'DSCF5881.jpg']) {
+  assert.ok(html.includes('<meta property="og:image" content="https://example.github.io/wedding/images/share-p20260405-upper-v2.jpg" />'), 'New link preview image missing from built metadata');
+  for (const file of ['share-p20260405-upper-v2.jpg', 'DSCF5881.jpg']) {
     assert.ok((await readFile(join(output, 'images', file))).length > 0, 'Requested image missing from build');
   }
   for (const value of [fixture.groom.name, fixture.groom.phone, fixture.accounts[0].number]) {
