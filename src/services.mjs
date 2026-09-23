@@ -65,34 +65,60 @@ export function loadKakao(key) {
 export function createMusic() {
   const context = new AudioContext();
   const master = context.createGain();
-  master.gain.value = 0.16;
+  master.gain.value = 0.22;
   master.connect(context.destination);
+  const beat = 60 / 112;
   const melody = [
-    60, 64, 67, 71, 69, 67, 64, 62, 57, 60, 64, 67, 65, 64, 62, 59,
+    [72, 76, 79, null, 76, 79, 81, 79],
+    [74, 79, 83, null, 81, 79, 76, 74],
+    [76, 81, 84, 83, 81, null, 79, 76],
+    [77, 81, 84, null, 81, 79, 77, 76],
+    [76, 79, 84, null, 83, 81, 79, 76],
+    [77, 81, 84, 86, 84, null, 81, 77],
+    [79, 83, 86, null, 84, 83, 81, 74],
+    [76, 79, 84, 79, 76, 74, 72, null],
   ];
-  let timer;
-  const phrase = () => {
-    melody.forEach((note, index) => {
-      const oscillator = context.createOscillator();
-      const envelope = context.createGain();
-      const at = context.currentTime + index * 0.62;
-      oscillator.type = "sine";
-      oscillator.frequency.value = 440 * 2 ** ((note - 69) / 12);
-      envelope.gain.setValueAtTime(0, at);
-      envelope.gain.linearRampToValueAtTime(0.5, at + 0.02);
-      envelope.gain.exponentialRampToValueAtTime(0.001, at + 2.3);
-      oscillator.connect(envelope);
-      envelope.connect(master);
-      oscillator.start(at);
-      oscillator.stop(at + 2.4);
+  const chords = [
+    [60, 64, 67], [59, 62, 67], [60, 64, 69], [60, 65, 69],
+    [60, 64, 67], [60, 65, 69], [59, 62, 67], [60, 64, 67],
+  ];
+  const bass = [48, 43, 45, 41, 48, 41, 43, 48];
+  const note = (pitch, at, duration, volume, type) => {
+    const oscillator = context.createOscillator();
+    const envelope = context.createGain();
+    oscillator.type = type;
+    oscillator.frequency.value = 440 * 2 ** ((pitch - 69) / 12);
+    envelope.gain.setValueAtTime(0, at);
+    envelope.gain.linearRampToValueAtTime(volume, at + 0.008);
+    envelope.gain.exponentialRampToValueAtTime(0.001, at + duration);
+    oscillator.connect(envelope);
+    envelope.connect(master);
+    oscillator.onended = () => { oscillator.disconnect(); envelope.disconnect(); };
+    oscillator.start(at);
+    oscillator.stop(at + duration + 0.02);
+  };
+  const phrase = (start) => {
+    melody.forEach((bar, barIndex) => {
+      const at = start + barIndex * 4 * beat;
+      bar.forEach((pitch, step) => {
+        if (pitch !== null) note(pitch, at + step * beat / 2, beat * 0.65, 0.38, "triangle");
+      });
+      for (const offset of [0, 2]) {
+        note(bass[barIndex], at + offset * beat, beat * 0.8, 0.24, "sine");
+        chords[barIndex].forEach(pitch => note(pitch, at + (offset + 1) * beat, beat * 0.4, 0.1, "triangle"));
+      }
     });
   };
-  phrase();
-  timer = setInterval(() => {
-    if (context.state === "running") phrase();
-  }, 9920);
+  let nextPhrase = 0;
+  const schedule = () => {
+    if (context.state !== "running" || nextPhrase > context.currentTime + 0.2) return;
+    const start = Math.max(nextPhrase, context.currentTime + 0.04);
+    phrase(start);
+    nextPhrase = start + melody.length * 4 * beat;
+  };
+  const timer = setInterval(schedule, 100);
   return {
-    play: () => context.resume(),
+    play: async () => { await context.resume(); schedule(); },
     pause: () => context.suspend(),
     close: () => {
       clearInterval(timer);

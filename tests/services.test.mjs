@@ -1,9 +1,63 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
-import { mapLinks, sharePayload } from '../src/services.mjs';
+import { createMusic, mapLinks, sharePayload } from '../src/services.mjs';
 import { config } from '../src/config.mjs';
 import { invitationMetadata, mergePrivateConfig } from '../scripts/private-config.mjs';
+
+test('upbeat music schedules 112 BPM melody and accompaniment, pauses and loops on audio time', async context => {
+  const originalAudioContext = globalThis.AudioContext;
+  const oscillators = [];
+  let audio;
+  let tick;
+  let cleared = false;
+  globalThis.AudioContext = class {
+    state = 'suspended';
+    currentTime = 0;
+    destination = {};
+    constructor() { audio = this; }
+    createGain() {
+      return { gain: { value: 0, setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {}, disconnect() {} };
+    }
+    createOscillator() {
+      const oscillator = { frequency: {}, connect() {}, disconnect() {}, start(at) { this.at = at; }, stop(at) { this.until = at; } };
+      oscillators.push(oscillator);
+      return oscillator;
+    }
+    async resume() { this.state = 'running'; }
+    async suspend() { this.state = 'suspended'; }
+    async close() { this.state = 'closed'; }
+  };
+  context.after(() => {
+    if (originalAudioContext === undefined) delete globalThis.AudioContext;
+    else globalThis.AudioContext = originalAudioContext;
+  });
+  context.mock.method(globalThis, 'setInterval', callback => { tick = callback; return 123; });
+  context.mock.method(globalThis, 'clearInterval', timer => { assert.equal(timer, 123); cleared = true; });
+  const music = createMusic();
+  assert.equal(oscillators.length, 0);
+  await music.play();
+  const phraseNotes = oscillators.length;
+  assert.ok(phraseNotes > 100);
+  assert.ok(Math.abs(oscillators[1].at - oscillators[0].at - 60 / 112 / 2) < 0.0001);
+  assert.ok(oscillators.some(oscillator => oscillator.type === 'sine'));
+  assert.ok(oscillators.some(oscillator => oscillator.type === 'triangle'));
+  assert.ok(oscillators.every(oscillator => oscillator.until - oscillator.at < 0.5));
+  tick();
+  assert.equal(oscillators.length, phraseNotes);
+  await music.pause();
+  tick();
+  assert.equal(oscillators.length, phraseNotes);
+  await music.play();
+  assert.equal(oscillators.length, phraseNotes);
+  audio.currentTime = 0.04 + 32 * 60 / 112 - 0.1;
+  tick();
+  assert.equal(oscillators.length, phraseNotes * 2);
+  assert.ok(Math.abs(oscillators[phraseNotes].at - 0.04 - 32 * 60 / 112) < 0.0001);
+  await music.close();
+  assert.equal(cleared, true);
+  assert.equal(audio.state, 'closed');
+});
 
 test('share has two separate targets and absolute image URL under repository subpath', () => {
   const payload = sharePayload(config, 'https://example.github.io/wedding/?preview=1#home');
