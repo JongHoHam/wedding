@@ -167,7 +167,7 @@ section[id] {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 53%;
+  object-position: center;
   animation: photo-enter 1.8s ease both;
 }
 .hero-video {
@@ -1416,29 +1416,6 @@ section[id] {
   top: 18px;
   color: #29483b;
 }
-.entrance-petals {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  overflow: hidden;
-  pointer-events: none;
-}
-.entrance-petals span {
-  position: absolute;
-  top: -20px;
-  left: var(--petal-left);
-  width: 9px;
-  height: 13px;
-  border-radius: 85% 15% 75% 25%;
-  background: #f3bfd0;
-  box-shadow: inset 2px 1px 3px #fff8;
-  animation: entrance-petal 6s var(--petal-delay) linear both;
-}
-.entrance-petals span:nth-child(3n) {
-  width: 6px;
-  height: 9px;
-  background: #ffe1e8;
-}
 @keyframes entrance-letter {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1449,18 +1426,8 @@ section[id] {
     opacity: 0;
   }
 }
-@keyframes entrance-petal {
-  0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(0); }
-  12% { opacity: 0.85; }
-  85% { opacity: 0.7; }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--petal-drift), 90svh, 0) rotate(var(--petal-turn));
-  }
-}
 @media (prefers-reduced-motion: reduce) {
-  .wedding-entrance,
-  .entrance-petals { display: none; }
+  .wedding-entrance { display: none; }
 }
 @keyframes photo-enter {
   from {
@@ -1483,9 +1450,6 @@ section[id] {
   }
 }
 @media (min-width: 1400px) {
-  .hero-photo {
-    object-position: 50% 56%;
-  }
   .hero-content {
     bottom: 28%;
   }
@@ -1516,9 +1480,6 @@ section[id] {
   .top-actions .icon-button {
     width: 36px;
     height: 36px;
-  }
-  .hero-photo {
-    object-position: 52% center;
   }
   .hero-topline {
     inset: max(18px, env(safe-area-inset-top)) 20px auto;

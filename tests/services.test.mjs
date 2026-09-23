@@ -71,7 +71,9 @@ test('gallery retains all 29 supplied photos independently of hero and share ima
   assert.equal(new Set(config.gallery.map(photo => photo.src)).size, 29);
   assert.equal(config.gallery.filter(photo => /\/DSCF\d+\.JPG$/.test(photo.src)).length, 28);
   assert.ok(config.gallery.at(-1).src.endsWith('P20260517_214302000_DFD2D9ED-B33A-49E4-ADD1-25ED0DB15000.JPG'));
-  assert.equal(config.hero, './images/hero.jpg');
+  assert.equal(config.hero, './images/wedding-first-frame.jpg');
+  const hero = await readFile(new URL(`../public/${config.hero}`, import.meta.url));
+  assert.equal(hero.subarray(0, 3).toString('hex'), 'ffd8ff');
   assert.equal(config.shareImage, './images/DSCF5872.jpg');
   for (const photo of config.gallery) {
     const image = await readFile(new URL(`../public/${photo.src}`, import.meta.url));

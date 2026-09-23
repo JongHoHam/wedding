@@ -9,7 +9,7 @@ export const config = {
   siteUrl: "https://jonghoham.github.io/wedding/",
   kakaoJsKey: "38a8993d018421477735f7a0380d0ca1",
   musicUrl: "",
-  hero: "./images/hero.jpg",
+  hero: "./images/wedding-first-frame.jpg",
   heroVideo: "./videos/wedding.mp4",
   shareImage: "./images/DSCF5872.jpg",
   groom: {

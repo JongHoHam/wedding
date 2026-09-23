@@ -962,7 +962,7 @@ function Invitation() {
               <img
                 className="hero-photo"
                 src={config.hero}
-                alt="신랑 신부 웨딩 사진 · 시안용 이미지"
+                alt="웨딩 동영상 첫 장면"
                 fetchPriority="high"
               />
               <HeroVideo active={!entrance || entranceComplete} onSettled={setVideoSettled} />
@@ -994,19 +994,6 @@ function Invitation() {
                   </IconButton>
                 </div>
               )}
-              <div className="entrance-petals" aria-hidden="true">
-                {Array.from({ length: 14 }, (_, index) => (
-                  <span
-                    key={index}
-                    style={{
-                      "--petal-left": `${(index * 37) % 100}%`,
-                      "--petal-delay": `${index * 0.23}s`,
-                      "--petal-drift": `${index % 2 ? 48 : -36}px`,
-                      "--petal-turn": `${120 + index * 31}deg`,
-                    }}
-                  />
-                ))}
-              </div>
               <div className="hero-topline">
                 <div className="hero-place">
                   <IconButton
