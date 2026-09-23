@@ -92,8 +92,8 @@ test('navigation links keep longitude and latitude in provider-specific order', 
   assert.ok(links.android.startsWith(`geo:${config.venue.lat},${config.venue.lng}`));
 });
 
-test('parking offers complimentary tickets subject to availability', () => {
-  assert.equal(config.venue.parking, '예식 하객분들께 무료 주차권을 제공합니다. 준비된 수량이 소진될 수 있습니다.');
+test('parking offers limited complimentary tickets and explains standard rates when exhausted', () => {
+  assert.equal(config.venue.parking, '예식 하객분들께 무료 주차권을 제공합니다. 준비된 수량이 소진될 수 있습니다. 무료 주차권 소진 시 일반 주차요금이 적용됩니다. 입차 후 1시간은 무료이며, 이후 30분당 1,000원, 1일 최대 5,000원이 부과됩니다.');
 });
 
 test('exactly 100 distinct mobile wedding references from two providers', async () => {
