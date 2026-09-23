@@ -216,15 +216,17 @@ section[id] {
   color: var(--green);
 }
 .hero-content {
+  --hero-script-size: 33px;
   position: absolute;
-  inset: auto 20px 30%;
+  inset: calc(50% - var(--hero-script-size) * 0.7) 20px auto;
   text-align: center;
   animation: rise-in 1.3s 0.15s both;
   text-shadow: 0 2px 22px #23392b60;
 }
 .hero-script {
   font-family: var(--english);
-  font-size: 33px;
+  font-size: var(--hero-script-size);
+  line-height: 1.4;
   font-style: italic;
   margin-bottom: 12px;
 }
@@ -1480,13 +1482,10 @@ section[id] {
 }
 @media (min-width: 1400px) {
   .hero-content {
-    bottom: 28%;
+    --hero-script-size: 37px;
   }
   .hero h1 {
     font-size: 76px;
-  }
-  .hero-script {
-    font-size: 37px;
   }
 }
 @media (max-width: 700px) {
@@ -1518,11 +1517,10 @@ section[id] {
     gap: 8px;
   }
   .hero-content {
-    bottom: 30%;
+    --hero-script-size: 26px;
     inset-inline: 15px;
   }
   .hero-script {
-    font-size: 26px;
     margin-bottom: 14px;
   }
   .hero h1 {
@@ -1682,8 +1680,8 @@ section[id] {
     font-size: 42px;
     gap: 19px;
   }
-  .hero-script {
-    font-size: 23px;
+  .hero-content {
+    --hero-script-size: 23px;
   }
   .hero-message {
     font-size: 11px;
@@ -1711,9 +1709,6 @@ section[id] {
   }
 }
 @media (max-width: 700px) {
-  .hero-content {
-    bottom: 34%;
-  }
   .invitation {
     padding-top: 42px;
   }
@@ -1731,11 +1726,11 @@ section[id] {
 }
 @media (max-height: 500px) {
   .hero-content {
+    --hero-script-size: 22px;
     top: 76px;
     bottom: auto;
   }
   .hero-script {
-    font-size: 22px;
     margin-bottom: 4px;
   }
   .hero h1 {
