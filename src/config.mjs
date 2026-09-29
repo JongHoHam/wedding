@@ -18,7 +18,7 @@ export const config = {
   },
   hero: "./images/wedding-first-frame.jpg",
   heroVideo: "./videos/wedding.mp4",
-  shareImage: "./images/share-p20260405-upper-v2.jpg",
+  shareImage: "./images/share-revision2-20260929.jpg",
   groom: {
     name: "김서준",
     short: "서준",
@@ -60,25 +60,8 @@ export const config = {
       "예식 하객분들께 무료 주차권을 제공합니다. 준비된 수량이 소진될 수 있습니다. 무료 주차권 소진 시 일반 주차요금이 적용됩니다. 입차 후 1시간은 무료이며, 이후 30분당 1,000원, 1일 최대 5,000원이 부과됩니다.",
     phone: "064-738-6400",
   },
-  gallery: [
-    "P20260517_185610000_6D140E11-A8AD-4956-AFFF-7F34E1718716.JPG",
-    "P20260517_190652000_075DE02D-229E-46C8-8C2D-EA1412A6DBBD.JPG",
-    "P20260517_212041000_7D03A05E-7E96-4C5E-BA9C-0DC1FB5DD393.JPG",
-    "P20260517_214302000_DFD2D9ED-B33A-49E4-ADD1-25ED0DB15000.JPG",
-    "P20260517_222528000_3EC7B0AE-2404-4681-9FDD-C3A2F66F148E.JPG",
-    "P20260518_084924000_794AEAE1-BFD8-422C-8815-B50A697EC836.JPG",
-    "P20260518_094606000_306928D4-78CB-4327-8941-4F775436FBA9.JPG",
-    "P20260518_100737000_BF64B6B4-4493-4F1B-BCA1-D5CF90C474A7.JPG",
-    "P20260518_100943000_FF9ADBBB-8823-46C9-B65D-B5824D713419.JPG",
-    "P20260518_101800000_F7798362-F385-4C1E-89F8-35EFECBB0E2B.JPG",
-    "P20260518_103737000_1FE46078-18C5-4EA9-A225-6E09BD5332EF.JPG",
-    "P20260518_104041000_1B3BC22C-AE5D-4246-9949-11343348A283.JPG",
-    "P20260902_121552000_012B006F-2F1D-4557-9324-6D27980CF7CE.JPG",
-    "P20260909_103821000_1B6A9CAD-362A-43FE-B34E-495993C9CC67.JPG",
-    "P20260909_121528375_0A5A0EED-C343-4B0C-B0E0-BDD9F5BF8ED0.JPG",
-    "P20260917_174630000_B1D47EBC-799A-4104-9724-663973B1A4A9.JPG",
-  ].map((filename, index) => ({
-    src: `./images/${filename}`,
+  gallery: Array.from({ length: 18 }, (_, index) => ({
+    src: `./images/revision2-20260929/${index + 1}.JPG`,
     alt: `함께한 웨딩의 순간 ${index + 1}`,
   })),
   accounts: [

@@ -77,7 +77,7 @@ test('share has two separate targets and absolute image URL under repository sub
   assert.equal(payload.buttons.length, 2);
   assert.equal(payload.buttons[0].link.webUrl, 'https://example.github.io/wedding/');
   assert.equal(payload.buttons[1].link.mobileWebUrl, 'https://example.github.io/wedding/?view=location');
-  assert.equal(payload.content.imageUrl, 'https://example.github.io/wedding/images/share-p20260405-upper-v2.jpg');
+  assert.equal(payload.content.imageUrl, 'https://example.github.io/wedding/images/share-revision2-20260929.jpg');
 });
 
 test('navigation links keep longitude and latitude in provider-specific order', () => {
@@ -137,36 +137,38 @@ test('both airport buses display the bundled official timetable image', async ()
   }
 });
 
-test('gallery uses every P-prefixed photo in filename order independently of hero and share images', async () => {
-  const photos = (await readdir(new URL('../public/images/', import.meta.url)))
-    .filter(filename => /^p.*\.(jpe?g|png|webp)$/i.test(filename)).sort();
-  assert.equal(photos.length, 16);
-  assert.deepEqual(config.gallery.map(photo => photo.src), photos.map(filename => `./images/${filename}`));
+test('gallery uses only the 18 numbered revision photos in numeric filename order', async () => {
+  const photos = (await readdir(new URL('../public/images/revision2-20260929/', import.meta.url)))
+    .filter(filename => /^\d+\.JPG$/.test(filename)).sort((first, second) => parseInt(first, 10) - parseInt(second, 10));
+  assert.deepEqual(photos, Array.from({ length: 18 }, (_, index) => `${index + 1}.JPG`));
+  assert.deepEqual(config.gallery.map(photo => photo.src), photos.map(filename => `./images/revision2-20260929/${filename}`));
   assert.equal(config.hero, './images/wedding-first-frame.jpg');
   const hero = await readFile(new URL(`../public/${config.hero}`, import.meta.url));
   assert.equal(hero.subarray(0, 3).toString('hex'), 'ffd8ff');
-  assert.equal(config.shareImage, './images/share-p20260405-upper-v2.jpg');
+  assert.equal(config.shareImage, './images/share-revision2-20260929.jpg');
   for (const photo of config.gallery) {
     const image = await readFile(new URL(`../public/${photo.src}`, import.meta.url));
     assert.equal(image.subarray(0, 3).toString('hex'), 'ffd8ff');
     assert.ok(photo.alt);
   }
-  const closing = await readFile(new URL('../public/images/DSCF5881.jpg', import.meta.url));
+  const closing = await readFile(new URL('../public/images/revision2-20260929/closing.JPG', import.meta.url));
   assert.equal(closing.subarray(0, 3).toString('hex'), 'ffd8ff');
+  const app = await readFile(new URL('../src/main.jsx', import.meta.url), 'utf8');
+  assert.ok(app.includes('src="./images/revision2-20260929/closing.JPG"'));
 });
 
 test('link previews use the new share photo even with the legacy default in private settings', async () => {
-  const previousImages = ['hero.jpg', 'DSCF5872.jpg', '(thumbnail)P20260405_183943000_93EB75D6-7198-42B3-9590-42593FFF470F.JPG', 'share-p20260405-centered.jpg'];
+  const previousImages = ['hero.jpg', 'DSCF5872.jpg', '(thumbnail)P20260405_183943000_93EB75D6-7198-42B3-9590-42593FFF470F.JPG', 'share-p20260405-centered.jpg', 'share-p20260405-upper-v2.jpg'];
   for (const shareImage of previousImages.flatMap(filename => [`./images/${filename}`, `images/${filename}`, new URL(`./images/${filename}`, config.siteUrl).href]).concat(config.shareImage)) {
     const merged = mergePrivateConfig(config, JSON.stringify({ shareImage }));
-    const expected = new URL('./images/share-p20260405-upper-v2.jpg', config.siteUrl).href;
+    const expected = new URL('./images/share-revision2-20260929.jpg', config.siteUrl).href;
     assert.equal(sharePayload(merged, config.siteUrl).content.imageUrl, expected);
     const html = invitationMetadata('<!-- invitation-metadata:start --><!-- invitation-metadata:end -->', merged);
     assert.ok(html.includes(`<meta property="og:image" content="${expected}" />`));
   }
   const custom = mergePrivateConfig(config, JSON.stringify({ shareImage: 'https://example.com/custom.jpg' }));
   assert.equal(custom.shareImage, 'https://example.com/custom.jpg');
-  const image = await readFile(new URL('../public/images/share-p20260405-upper-v2.jpg', import.meta.url));
+  const image = await readFile(new URL('../public/images/share-revision2-20260929.jpg', import.meta.url));
   assert.equal(image.subarray(0, 3).toString('hex'), 'ffd8ff');
   assert.ok(image.length > 10000);
 });

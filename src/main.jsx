@@ -1246,7 +1246,7 @@ function Invitation() {
             </section>
             <section className="closing">
               <img
-                src="./images/DSCF5881.jpg"
+                src="./images/revision2-20260929/closing.JPG"
                 alt="함께한 웨딩의 따뜻한 순간"
                 loading="lazy"
               />
