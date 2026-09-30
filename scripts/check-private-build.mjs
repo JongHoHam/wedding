@@ -37,7 +37,7 @@ try {
   const javascript = (await Promise.all(assets.filter(file => file.endsWith('.js')).map(file => readFile(join(output, 'assets', file), 'utf8')))).join('\n');
   assert.ok(html.includes(fixture.title), 'Private title missing from metadata');
   assert.ok(html.includes('<meta property="og:image" content="https://example.github.io/wedding/images/share-revision2-20260929-v2.jpg" />'), 'New link preview image missing from built metadata');
-  for (const file of ['share-revision2-20260929-v2.jpg', 'revision2-20260929/closing.JPG', ...Array.from({ length: 18 }, (_, index) => `revision2-20260929/${index + 1}.JPG`)]) {
+  for (const file of ['share-revision2-20260929-v2.jpg', 'revision2-20260929/closing.JPG', ...Array.from({ length: 19 }, (_, index) => `revision3-20260930/${index + 1}.${index === 11 ? 'PNG' : 'JPG'}`)]) {
     assert.ok((await readFile(join(output, 'images', file))).length > 0, 'Requested image missing from build');
   }
   for (const value of [fixture.groom.name, fixture.groom.phone, fixture.accounts[0].number]) {

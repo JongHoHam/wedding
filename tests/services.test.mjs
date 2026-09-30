@@ -137,18 +137,19 @@ test('both airport buses display the bundled official timetable image', async ()
   }
 });
 
-test('gallery uses only the 18 numbered revision photos in numeric filename order', async () => {
-  const photos = (await readdir(new URL('../public/images/revision2-20260929/', import.meta.url)))
-    .filter(filename => /^\d+\.JPG$/.test(filename)).sort((first, second) => parseInt(first, 10) - parseInt(second, 10));
-  assert.deepEqual(photos, Array.from({ length: 18 }, (_, index) => `${index + 1}.JPG`));
-  assert.deepEqual(config.gallery.map(photo => photo.src), photos.map(filename => `./images/revision2-20260929/${filename}`));
+test('gallery uses all 19 revision3 photos in numeric order including the PNG', async () => {
+  const photos = (await readdir(new URL('../public/images/revision3-20260930/', import.meta.url)))
+    .filter(filename => /^\d+\.(JPG|PNG)$/.test(filename)).sort((first, second) => parseInt(first, 10) - parseInt(second, 10));
+  assert.deepEqual(photos, Array.from({ length: 19 }, (_, index) => `${index + 1}.${index === 11 ? 'PNG' : 'JPG'}`));
+  assert.deepEqual(config.gallery.map(photo => photo.src), photos.map(filename => `./images/revision3-20260930/${filename}`));
   assert.equal(config.hero, './images/wedding-first-frame.jpg');
   const hero = await readFile(new URL(`../public/${config.hero}`, import.meta.url));
   assert.equal(hero.subarray(0, 3).toString('hex'), 'ffd8ff');
   assert.equal(config.shareImage, './images/share-revision2-20260929-v2.jpg');
   for (const photo of config.gallery) {
     const image = await readFile(new URL(`../public/${photo.src}`, import.meta.url));
-    assert.equal(image.subarray(0, 3).toString('hex'), 'ffd8ff');
+    if (photo.src.endsWith('.PNG')) assert.equal(image.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+    else assert.equal(image.subarray(0, 3).toString('hex'), 'ffd8ff');
     assert.ok(photo.alt);
   }
   const closing = await readFile(new URL('../public/images/revision2-20260929/closing.JPG', import.meta.url));

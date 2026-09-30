@@ -60,8 +60,8 @@ export const config = {
       "예식 하객분들께 무료 주차권을 제공합니다. 준비된 수량이 소진될 수 있습니다. 무료 주차권 소진 시 일반 주차요금이 적용됩니다. 입차 후 1시간은 무료이며, 이후 30분당 1,000원, 1일 최대 5,000원이 부과됩니다.",
     phone: "064-738-6400",
   },
-  gallery: Array.from({ length: 18 }, (_, index) => ({
-    src: `./images/revision2-20260929/${index + 1}.JPG`,
+  gallery: Array.from({ length: 19 }, (_, index) => ({
+    src: `./images/revision3-20260930/${index + 1}.${index === 11 ? "PNG" : "JPG"}`,
     alt: `함께한 웨딩의 순간 ${index + 1}`,
   })),
   accounts: [
