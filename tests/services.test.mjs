@@ -93,7 +93,7 @@ test('navigation links keep longitude and latitude in provider-specific order', 
 });
 
 test('parking explains ticket collection and standard rates when tickets are not used', () => {
-  assert.equal(config.venue.parking, '예식 하객분들께 무료 주차권을 제공합니다. 3층 델리지아 입구에서 요청하시면 배부해 드리니, 필요하신 분은 꼭 받아가시기 바랍니다. 준비된 수량이 소진될 수 있습니다. 무료 주차권을 사용하지 않으실 경우 일반 주차요금이 적용됩니다. 입차 후 1시간은 무료이며, 이후 30분당 1,000원, 1일 최대 5,000원이 부과됩니다.');
+  assert.equal(config.venue.parking, '예식 하객분들께 무료 주차권을 제공합니다. 3층 델리지아 입구에서 요청하시면 배부해 드리니, 필요하신 분은 꼭 받아가시기 바랍니다. 무료 주차권을 사용하지 않으실 경우 일반 주차요금이 적용됩니다. 입차 후 1시간은 무료이며, 이후 30분당 1,000원, 1일 최대 5,000원이 부과됩니다.');
 });
 
 test('exactly 100 distinct mobile wedding references from two providers', async () => {
