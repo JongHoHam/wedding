@@ -494,7 +494,7 @@ function Directions({ toast, openViewer }) {
           <a className="text-link" href="https://www.iccjeju.co.kr/guide/03.php" target="_blank" rel="noreferrer">공식 주차 안내<ExternalLink size={13} /></a>
         </div>
       </div>
-      <p className="fine-print"><a className="text-link" href="https://www.iccjeju.co.kr/guide/02.php" target="_blank" rel="noreferrer">ICC 공식 교통·버스 안내<ExternalLink size={13} /></a><br />2026. 09. 17 확인 · 운행·요금은 변경될 수 있습니다.</p>
+      <p className="fine-print"><a className="text-link" href="https://www.iccjeju.co.kr/guide/02.php" target="_blank" rel="noreferrer">ICC 공식 교통·버스 안내<ExternalLink size={13} /></a><br />2026. 10. 16 확인 · 운행·요금은 변경될 수 있습니다.</p>
       {nav && (
         <Modal
           title={`${{ tmap: "티맵", naver: "네이버지도", kakao: "카카오내비" }[nav]}로 길찾기`}
